@@ -23,11 +23,11 @@ body {
     color: black;
   }
   #main-content{
-      text-align: center;
+      
 }
 
 h1{
-    font-size:60px;
+    
     /*color:#009900;*/
 }
 h5{
@@ -41,4 +41,7 @@ h5{
 .btn:focus,btn:active{
     outline: none !important;
     box-shadow: none;
+}
+.btn{
+    background-color:white;
 }
