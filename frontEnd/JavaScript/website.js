@@ -39,6 +39,16 @@ $(document).ready(function(){
     $("#video-tog4").toggle();
   })
 })
+//Loads FAQ onto the Home Page
+$(document).ready(function(){
+  $("#b1").click(function(e){
+    e.preventDefault();
+    var content = $("#faq").html();
+    var content2 = $("#new-title").html();
+    $("#main-content").replaceWith('<div id="new-content">' + content + '</div');
+    $("#home-page").replaceWith('<h1 class="display-1">' + content2 + '</div');
+  })
+})
 
 // $(document).ready(function(){
 //   $("#vid-field5").click(function(){
