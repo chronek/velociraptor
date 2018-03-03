@@ -10,10 +10,15 @@ QB Object
 	- determines sack prob ***
 	@ - throws at certain time
 	@ - needs to predict travel time and route
+	@ - hands off if rb in range
+	@ - switches to pass play if rb too far away on run play
+	- determines catch prob***
+	- searches for rand receiver
+	- searches players for best receiver***
 
 RB Object
-	- might take ball
-	- runs route
+	@ - might take ball
+	@ - runs route
 
 Defensive_Back_Zone
 	- needs to choose which man in range he chases

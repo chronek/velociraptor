@@ -40,6 +40,7 @@ var Ball = function(play_type, QB) {
 
 	this.handoff = function(newPlayer) {
 		this.player = newPlayer;
+		newPlayer.takeBall();
 	}
 
 
@@ -162,6 +163,14 @@ var Quater_Back = function(_name, _loc, wait) {
 	Player.call(this, _name, _loc);
 	this.wait_time = wait;	//nums of secs to wait
 	this.index = 0;
+	this.range;
+
+	this.setRange = function() {
+		this.range = new range(
+			this.loc.plus(new Location(-20, 20)), 
+			this.loc.plus(new Location(20, -20))
+		);
+	}
 
 	this.throw = function(target, ball){
 		if(target.steps[target.index + 90] != undefined) {
@@ -175,9 +184,16 @@ var Quater_Back = function(_name, _loc, wait) {
 
 	this.action = function(play, ball, target){
 		if(play == "run" && this.wait_time == index) {
-			ball.handoff(target);
+			this.setRange();
+			if(this.range.inRange(target)){
+				ball.handoff(target);
+			}
+			else {
+				this.play = "pass";
+				this.wait_time += 60;
+			}
 		}
-		else if(ball.thrown == false && this.wait_time * 60 <= index) {
+		if(play == "pass" && ball.thrown == false && this.wait_time * 60 <= index) {
 			this.throw(target, ball);
 		}
 		if(index < this.steps.length && this.status != "tackled") {
@@ -187,7 +203,14 @@ var Quater_Back = function(_name, _loc, wait) {
 	}
 }
 
+var Running_Back = function(_name, _loc) {
+	Player.call(this, _name, _loc);
+	this.hasBall = false;
 
+	this.takeBall = function() {
+		this.hasBall = true;
+	}
+}
 
 
 
