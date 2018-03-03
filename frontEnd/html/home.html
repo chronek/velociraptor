@@ -3,8 +3,11 @@
   <head>
     <meta charset="utf-8">
     <title>Velociraptor Football</title>
+    <!--Fonts-->
     <link href="https://fonts.googleapis.com/css?family=Muli" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Julius+Sans+One" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Libre+Baskerville" rel="stylesheet">
+    <!--jQuery, Bootstrap, etc -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
@@ -14,14 +17,16 @@
   </head>
   <body>
     <div class="container-fluid">
-      <div class="row">
-        <div id="logo" class="col-lg-10">
-          <h1 class="display-1">Velociraptor Football</h1>
-        </div>
+      <div class="row" id="logo">
         <div class="col-lg-2">
-          <img id="logo" src="../images/vraptor.png" alt="logo" width="200" height="200">
+          <img id="raptor" src="../images/vraptor.png" alt="logo" width="200" height="200">
+        </div>
+        <div class="col-lg-10">
+          <h1 id="home-page"class="display-1">Velocirapter Football</h1>
+          <h1 id="new-title" class="display-1">FAQ</h1>
         </div>
       </div>
+    </div>
       <div class="row">
         <!--Navigation-->
         <div class="col-lg-2">
@@ -38,17 +43,31 @@
             <li class="nav-item">
               <a href="license.html" class="nav-link make-it-slow links">Licensing</a>
             </li>
+            <li class="nav-item">
+              <button id="b1" class="nav-link make-it-slow links" type="button" name="button">FAQ</button>
+            </li>
           </ul>
         </div>
         <div id="main-content" class="col-lg-10">
-          <h4 class="display-4">Football</h4>
-          <!-- <p>Football takes place on a field that is 100 yards long and 53 yards
-          wide. There are two teams that play on opposing sides of the ball.
-          There are 22 players on the field at all times with 11 on each team.
-          There is an offense and defence.</p>
-          <p>The objective of the offensive team to to score the football into the
-          endzone, which results in 6 points. The objective of the defensive team
-          is to stop the offense from scoring.</p> -->
+          <h5 class="display-5">About us</h5>
+          <p id="remove">
+          We are team Velocirapter and we decided to make and education website that focuses
+          on teaching the game of American football. We implemented a Pixi/JavaScript game
+          which allows you to run different routes and offensive formations against varying
+          defensive formations. We are rag-tag team that joined forces at the last minute.
+          we hope that you learn something from our website!
+          <br><br>
+          Group Member Names: <br>
+          Eli B.<br>
+          Michael U.<br>
+          Chris <br>
+          Brandon G.
+          <br><br>
+          <br><br>
+          </p>
+
+          <p id="faq">Testing testing 123</p>
+
         </div>
       </div>
     </div>
