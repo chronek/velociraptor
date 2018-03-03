@@ -29,3 +29,7 @@ h1{
 
     background-color:#808080;
 }
+.btn:focus,btn:active{
+    outline: none !important;
+    box-shadow: none;
+}
