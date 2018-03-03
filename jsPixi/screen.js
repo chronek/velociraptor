@@ -114,6 +114,10 @@ var Player = function(_name, _loc) {
 	}
 }
 
+var Receiver = function(_name, _loc) {
+	Player.call(this, _name, _loc);
+}
+
 var Defensive_Back = function(_name, _speed, _loc) {
 	Player.call(this, _name, _loc);
 
@@ -132,19 +136,21 @@ var Defensive_Back = function(_name, _speed, _loc) {
 	}
 }
 
-var Defensive_Back_Man = function(_name, _speed, _loc) {
+var Defensive_Back_Man = function(_name, _speed, _target, _loc) {
 	Defensive_Back.call(this, _name, _speed, _loc);
+	this.target = _target;
+	this.thresh = this.loc.y + 25;
 
-	this.slide = function(target) {
-		this.loc.x = target.loc.x;
+	this.slide = function() {
+		this.loc.x = this.target.loc.x;
 	}
 
-	this.move = function(target, thresh) {
-		if(target.loc.y >= thresh) {
-			this.slide(target);
+	this.move = function() {
+		if(this.target.loc.y >= this.thresh) {
+			this.slide(this.target);
 		}
 		else {
-			this.chase(target.loc, 12);
+			this.chase(this.target.loc, 12);
 		}
 	}
 }
@@ -240,7 +246,7 @@ var line_height = 6;
 var add_y = line_height / 2;
 
 // create horizontal lines
-var hLines = [];
+var Lines = [];
 for (i = 1; i < 12; i++) {
   var line = new PIXI.Graphics();
   line.lineStyle(line_height, 0xffffff, 1);
@@ -249,7 +255,7 @@ for (i = 1; i < 12; i++) {
   line.y = tiles[i].y + add_y;
   line.moveTo(0,0);
   line.lineTo(0, width);
-  hLines.push(line);
+  Lines.push(line);
 }
 
 // vertical lines
@@ -260,6 +266,7 @@ vLine1.rotation = 0;
 vLine1.x = 250;
 vLine1.moveTo(0,0);
 vLine1.lineTo(0, height * 12);
+Lines.push(vLine1);
 
 var vLine2 = new PIXI.Graphics();
 vLine2.lineStyle(line_height, 0xffffff, 1);
@@ -268,77 +275,68 @@ vLine2.rotation = 0;
 vLine2.x = 520;
 vLine2.moveTo(0, 0);
 vLine2.lineTo(0, height * 12);
+Lines.push(vLine2);
 
 // game
+var Sprites = [];
+var objs = [];
+
 var ball = new Ball("run");
-var qb = new Quarter_Back("smith", new Location(275, 700), 0.1, ball);
-var rb = new Player("james", new Location(325, 700));
-var dm = new Defensive_Back_Man('brett', 120, new Location(325, 300));
-var rb2 = new Player("james", new Location(125, 700));
-var dm2 = new Defensive_Back_Man('brett', 120, new Location(125, 300));
+objs.push(new Quarter_Back("qb", new Location(width / 2 - 20, 700), 0, ball));
+objs.push(new Receiver("r1", new Location(125, 8 * height)));
+objs.push(new Receiver("r2", new Location(225, 8 * height)));
+objs.push(new Receiver("r3", new Location(width - 225, 8 * height)));
+objs.push(new Receiver("r4", new Location(width - 125, 8 * height)));
+objs.push(new Defensive_Back_Man('d1', 120, objs[1], new Location(125, 6 * height)));
+objs.push(new Defensive_Back_Man('d2', 120, objs[2], new Location(225, 6 * height)));
+objs.push(new Defensive_Back_Man('d3', 120, objs[3], new Location(width - 225, 6 * height)));
+objs.push(new Defensive_Back_Man('d4', 120, objs[4], new Location(width - 125, 6 * height)));
 
-var dmSprite2 = PIXI.Sprite.fromImage("red_thing.png");
-dmSprite2.x = dm2.loc.x;
-dmSprite2.y = dm2.loc.y;
 
-var dmSprite = PIXI.Sprite.fromImage("red_thing.png");
-dmSprite.x = dm.loc.x;
-dmSprite.y = dm.loc.y;
+Sprites.push(PIXI.Sprite.fromImage("Lol_circle.png"));
+Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
+Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
+Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
+Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
+Sprites.push(PIXI.Sprite.fromImage("red_thing.png"));
+Sprites.push(PIXI.Sprite.fromImage("red_thing.png"));
+Sprites.push(PIXI.Sprite.fromImage("red_thing.png"));
+Sprites.push(PIXI.Sprite.fromImage("red_thing.png"));
 
-var qbSprite = PIXI.Sprite.fromImage("Lol_circle.png");
-qbSprite.x = qb.loc.x;
-qbSprite.y = qb.loc.y;
+function loadSprites(_objs){
+	for(i = 0; i < Sprites.length; i++) {
+		Sprites[i].x = _objs[i].loc.x;
+		Sprites[i].y = _objs[i].loc.y;
+	}
+}
 
-// make sprite smaller
-qbSprite.scale.x = 0.8;
-qbSprite.scale.y = 0.8;
+for(i = 0; i < 12; i++) {
+	app.stage.addChild(tiles[i]);
+}
+for(i = 0; i < 13; i++) {
+	app.stage.addChild(Lines[i]);
+}
+for(i = 0; i < Sprites.length; i++) {
+	app.stage.addChild(Sprites[i]);
+}
 
-var rbSprite = PIXI.Sprite.fromImage("Pan_Blue_Circle.png");
-rbSprite.x = rb.loc.x;
-rbSprite.y = rb.loc.y;
+objs[1].addLeg(new Location(objs[1].loc.x - 125, 200), 2);
+objs[1].addLeg(new Location(objs[1].loc.x - 125, 0), .75);
+objs[2].addLeg(new Location(objs[2].loc.x, 500), .5);
+objs[2].addLeg(new Location(objs[2].loc.x + 250, 450), .7);
+objs[2].addLeg(new Location(objs[2].loc.x + 250, 150), .7);
+objs[3].addLeg(new Location(objs[3].loc.x, 0), 1.5);
+objs[4].addLeg(new Location(objs[4].loc.x + 85, 180), 1.75);
+objs[4].addLeg(new Location(objs[4].loc.x + 85, 0), .70);
 
-// make sprite smaller
-rbSprite.scale.x = 0.8;
-rbSprite.scale.y = 0.8;
-
-var rbSprite2 = PIXI.Sprite.fromImage("Pan_Blue_Circle.png");
-rbSprite2.x = rb2.loc.x;
-rbSprite2.y = rb2.loc.y;
-
-// make sprite smaller
-rbSprite2.scale.x = 0.8;
-rbSprite2.scale.y = 0.8;
-
-// adding all the tiles
-app.stage.addChild(tiles[0], tiles[1], tiles[2], tiles[3], tiles[4], tiles[5]);
-app.stage.addChild(tiles[6], tiles[7], tiles[8], tiles[9], tiles[10], tiles[11]);
-app.stage.addChild(hLines[0], hLines[1], hLines[2], hLines[3], hLines[4]);
-app.stage.addChild(hLines[5], hLines[6], hLines[7], hLines[8], hLines[9], hLines[10]);
-app.stage.addChild(vLine1, vLine2);
-
-app.stage.addChild(qbSprite, rbSprite, dmSprite, dmSprite2, rbSprite2);
-
-qb.addLeg(new Location(qb.loc.x + 50, qb.loc.y - 100), 2)
-rb.addLeg(new Location(rb.loc.x + 200, rb.loc.y - 650), 3)
-rb2.addLeg(new Location(rb2.loc.x - 125, rb2.loc.y - 450), 3)
-rb2.addLeg(new Location(rb2.loc.x - 125, rb2.loc.y - 650), 1)
 
 app.ticker.add(function(delta) {
-  //console.log(dm.loc);
-  ball.move();
-  qb.action(rb);
-  rb.move();
-  dm.move(rb, 350);
-  rb2.move();
-  dm2.move(rb2, 350);
-  dmSprite.x = dm.loc.x;
-  dmSprite.y = dm.loc.y;
-  dmSprite2.x = dm2.loc.x;
-  dmSprite2.y = dm2.loc.y;
-  qbSprite.x = qb.loc.x;
-  qbSprite.y = qb.loc.y;
-  rbSprite2.x = rb2.loc.x;
-  rbSprite2.y = rb2.loc.y;
-  rbSprite.x = rb.loc.x;
-  rbSprite.y = rb.loc.y;
+	//console.log(dm.loc);
+	ball.move();
+	objs[0].action(objs[1]);
+	for(i = 1; i < objs.length; i++) {
+		objs[i].move();
+	}
+
+	loadSprites(objs);
 });
