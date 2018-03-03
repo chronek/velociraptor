@@ -24,8 +24,8 @@ var Player = function(_name, _loc) {
 	}
 }
 
-var Defensive_Back_Man = function(_name, _loc, _coverage) {
-	Player.call(this, _name, _speed, _loc);
+var Defensive_Back = function(_name, _speed, _loc) {
+	Player.call(this, _name, _loc);
 
 	this.speed = _speed;	// being distance per second
 
@@ -33,15 +33,23 @@ var Defensive_Back_Man = function(_name, _loc, _coverage) {
 		return (dist / Math.sqrt(Math.pow(loc.x, 2) + Math.pow(loc.y, 2) ) );
 	}
 
+	this.chase = function(targetLoc, speed_multiplier) { 
+		this.loc.x = this.loc.x + (targetLoc.x - this.loc.x) 
+			* this.ROC(targetLoc, speed_multiplier * (this.speed / 60));
+			
+		this.loc.y = this.loc.y + (targetLoc.y - this.loc.y) 
+			* this.ROC(targetLoc, speed_multiplier * (this.speed / 60));
+	}
+
+
+}
+
+var Defensive_Back_Man = function(_name, _speed, _loc) {
+	Defensive_Back.call(this, _name, _loc);
+
 	this.slide = function(target) {
 		this.loc.x = target.loc.x();
 	}
-
-	this.chase = function(target) { 
-		this.loc.x = this.loc.x * this.ROC(target.loc, this.speed / 60);
-		this.loc.y = this.loc.y * this.ROC(target.loc, this.speed / 60);
-	}
-
 
 	this.move = function(target, thresh) {
 		if(target.loc.y <= thresh) {
@@ -53,10 +61,9 @@ var Defensive_Back_Man = function(_name, _loc, _coverage) {
 	}
 }
 
-var Defensive_Back_Zone = function(_name, _loc, _coverage) {
-	Player.call(this, _name, _speed, _loc);
+var Defensive_Back_Zone = function(_name, _speed, _loc, _coverage) {
+	Defensive_Back.call(this, _name, _loc);
 
-	this.speed = _speed;	// being distance per second
 	this.range;
 
 	this.setRange = function(center, xRadius, yRadius) {
@@ -66,23 +73,9 @@ var Defensive_Back_Zone = function(_name, _loc, _coverage) {
 		);
 	}
 
-	this.ROC = function(loc, dist) {  
-		return (dist / Math.sqrt(Math.pow(loc.x, 2) + Math.pow(loc.y, 2) ) );
-	}
-
-
-	this.chase = function(targetLoc, speed_multiplier) { 
-		this.loc.x = this.loc.x + (targetLoc.x - this.loc.x) 
-			* this.ROC(targetLoc, speed_multiplier * (this.speed / 60));
-			
-		this.loc.y = this.loc.y + (targetLoc.y - this.loc.y) 
-			* this.ROC(targetLoc, speed_multiplier * (this.speed / 60));
-	}
-
-
-	this.moveMan = function(targets) {
+	this.move = function(targets) {
 		targets.forEach(function(target) {
-			if(this.range.inRange(target){
+			if(this.range.inRange(target)) {
 				this.chase(target, 1);
 				return;
 			}
@@ -91,7 +84,6 @@ var Defensive_Back_Zone = function(_name, _loc, _coverage) {
 			}
 		});
 	}
-
 }
 
 var Location = function(_x, _y) {
