@@ -1,11 +1,6 @@
 body {
     font-family: 'Muli', sans-serif;
-}
-#logo h1{
-    /*color:#009900; */
-    
-}
-
+  }
   
   /* The slow way */
   .make-it-slow {
@@ -22,23 +17,11 @@ body {
     border-radius: 25px;
     color: black;
   }
-  #main-content{
-      text-align: center;
-}
-
-h1{
-    font-size:60px;
-    /*color:#009900;*/
-}
-h5{
-    color: 	#28333b; 
-}
-
-.btn:hover{
-
-    background-color:#808080;
-}
-.btn:focus,btn:active{
+  .hide {
+    display: none;
+  }
+  .btn:focus,.btn:active{
     outline: none !important;
     box-shadow: none;
-}
+  }
+  
