@@ -14,8 +14,14 @@ body {
   }
   
   .links {
+    font-family: 'Julius Sans One', sans-serif;
+    font-weight: bold;
     border-radius: 25px;
     color: black;
+    margin: 5px;
+  }
+  .links:hover{
+    color: rgb(156, 214, 185) !important;
   }
   .hide {
     display: none;
