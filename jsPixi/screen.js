@@ -165,7 +165,6 @@ vLine2.x = 400;
 vLine2.moveTo(0, 0);
 vLine2.lineTo(0, 600);
 
-
 // adding all the tiles
 app.stage.addChild(tile1, tile2, tile3, tile4, tile5, tile6);
 app.stage.addChild(tile7, tile8, tile9, tile10, tile11, tile12);
