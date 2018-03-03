@@ -29,7 +29,6 @@ body {
     color: rgb(156, 214, 185) !important;
   }
 
-
 h5{
     color: 	#28333b; 
 }
@@ -41,4 +40,7 @@ h5{
 .btn:focus,btn:active{
     outline: none !important;
     box-shadow: none;
+}
+.btn{
+    background-color:white;
 }
