@@ -71,19 +71,24 @@ var Defensive_Back_Zone = function(_name, _loc, _coverage) {
 	}
 
 
-	this.chase = function(target) { 
-		this.loc.x = this.loc.x * this.ROC(target.loc, this.speed / 60);
-		this.loc.y = this.loc.y * this.ROC(target.loc, this.speed / 60);
+	this.chase = function(targetLoc, speed_multiplier) { 
+		this.loc.x = this.loc.x + (targetLoc.x - this.loc.x) 
+			* this.ROC(targetLoc, speed_multiplier * (this.speed / 60));
+			
+		this.loc.y = this.loc.y + (targetLoc.y - this.loc.y) 
+			* this.ROC(targetLoc, speed_multiplier * (this.speed / 60));
 	}
 
 
 	this.moveMan = function(targets) {
 		targets.forEach(function(target) {
 			if(this.range.inRange(target){
-				this.chase(target, this.speed);
+				this.chase(target, 1);
 				return;
 			}
-			//else //DO
+			else {
+				this.chase(this.range.center, .4);
+			}
 		});
 	}
 
@@ -93,12 +98,18 @@ var Location = function(_x, _y) {
 	this.x = _x;
 	this.y = _y;
 
-	//ADD PLUS FUNCTION
+	this.plus = function(otherLoc) {
+		var outX = this.x + otherLoc.x;
+		var outY = this.y + otherLoc.y;
+		return = new Location(outX, outY)
+	}
 }
 
 var range = function(tl, br) {
 	this.topLeft = tl;
 	this.botRight = br;
+	this.center = new Location(((br.x - tl.x) / 2) 
+		+ tl.x, ((tl.y - br.y) / 2) + br.y);
 
 	this.inRange = function(target){
 		if(target.loc.x >= topLeft.x && target.loc.x <= botRight.x 
