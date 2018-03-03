@@ -1,6 +1,7 @@
 body {
     font-family: 'Muli', sans-serif;
   }
+
   
   /* The slow way */
   .make-it-slow {
@@ -11,11 +12,18 @@ body {
   /* Transition to a bigger shadow on hover */
   .make-it-slow:hover {
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    text-decoration: none;
   }
   
   .links {
+    font-family: 'Julius Sans One', sans-serif;
+    font-weight: bold;
     border-radius: 25px;
     color: black;
+    margin: 5px;
+  }
+  .links:hover{
+    color: rgb(156, 214, 185) !important;
   }
   .hide {
     display: none;
