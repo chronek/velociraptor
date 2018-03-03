@@ -2,7 +2,7 @@ var app = new PIXI.Application(800, 600, {backgroundColor : 0x1099bb});
 document.body.appendChild(app.view);
 
 // create a new Sprite from an image path
-var bunny = PIXI.Sprite.fromImage('bunny.jpeg')
+var bunny = PIXI.Sprite.fromImage('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSIzNSh53C1aG-5cQcKZNThW7F2o7eXl-fYmNpJsTxmVveIwqw2')
 
 // center the sprite's anchor point
 bunny.anchor.set(0.5);
