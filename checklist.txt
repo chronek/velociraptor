@@ -1,16 +1,15 @@
 *** = low priority
 
 Ball object
-	- faster travel speed
-	- attaches to player object
-	- optionally thrown at certain time
-	- needs to predict travel time and route
+	@ - faster travel speed
+	@ - attaches to player object
 
 QB Object
-	- throws ball
-	- hangs in pocket
-	- determines throw success
+	@ - throws ball
+	@ - hangs in pocket
 	- determines sack prob ***
+	@ - throws at certain time
+	@ - needs to predict travel time and route
 
 RB Object
 	- might take ball
@@ -27,3 +26,5 @@ Defensive_Lineman Object
 	- goes for sack ***
 
 extension class for recievers
+	- needs to catch ball
+	- determines throw success
