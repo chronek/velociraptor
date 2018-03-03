@@ -19,15 +19,19 @@ body {
   }
   
   .links {
+    font-family: 'Julius Sans One', sans-serif;
+    font-weight: bold;
     border-radius: 25px;
     color: black;
+    
+    margin: 5px;
   }
-  #main-content{
-      text-align: center;
-}
+  .links:hover{
+    color: rgb(156, 214, 185) !important;
+  }
 
 h1{
-    font-size:60px;
+    
     /*color:#009900;*/
 }
 h5{
@@ -41,4 +45,7 @@ h5{
 .btn:focus,btn:active{
     outline: none !important;
     box-shadow: none;
+}
+.btn{
+    background-color:white;
 }
