@@ -30,11 +30,26 @@ var Location = function(_x, _y) {
 	this.y = _y;
 }
 
-var Defensive_Back = function(_name, _loc, _coverage) {
-	Player.call(this, _name, _loc);
+var range = function(tl, br) {
+	this.topLeft = tl;
+	this.botRight = br;
+
+	this.inRange = function(target){
+		if(target.loc.x >= topLeft.x && target.loc.x <= botRight.x 
+			&& target.loc.y <= topLeft.y && target.loc.y >= botRight.y){
+
+			return true;
+		}
+
+		return false;
+	}
+}
+
+var Defensive_Back_Man = function(_name, _loc, _coverage) {
+	Player.call(this, _name, _speed, _loc);
 
 	this.coverage = _coverage; //man or zone
-	this.range;
+	this.speed = _speed;	// being distance per second
 
 	this.ROC = function(loc, dist) {  
 		return (dist / Math.sqrt(Math.pow(loc.x, 2) + Math.pow(loc.y, 2) ) );
@@ -44,29 +59,51 @@ var Defensive_Back = function(_name, _loc, _coverage) {
 		this.loc.x = target.loc.x();
 	}
 
-	this.chase = function(target, speed) { //speed being distance per second
-		this.loc.x = this.loc.x * this.ROC(target.loc, speed / 60);
+	this.chase = function(target) { 
+		this.loc.x = this.loc.x * this.ROC(target.loc, this.speed / 60);
+	}
+
+
+	this.move = function(target, thresh) {
+		if(target.loc.y <= thresh) {
+			this.slide(target);
+		}
+		else {
+			this.chase(target, this.speed);
+		}
+	}
+}
+
+var Defensive_Back_Zone = function(_name, _loc, _coverage) {
+	Player.call(this, _name, _speed, _loc);
+
+	this.coverage = _coverage; //man or zone
+	this.speed = _speed;	// being distance per second
+	this.range;
+
+	this.ROC = function(loc, dist) {  
+		return (dist / Math.sqrt(Math.pow(loc.x, 2) + Math.pow(loc.y, 2) ) );
+	}
+
+
+	this.chase = function(target) { 
+		this.loc.x = this.loc.x * this.ROC(target.loc, this.speed / 60);
 	}
 
 	this.setRange = function(center, xRadius, yRadius) {
-		this.range = {topLeft: center.plus(new Location(-xRadius, yRadius)), 
-			topRight: center.plus(new Location(xRadius, yRadius)), 
-			botLeft: center.plus(new Location(-xRadius, -yRadius)), 
-			botRight: center.plus(new Location(xRadius, -yRadius))}
+		this.range = new range(
+			center.plus(new Location(-xRadius, yRadius)), 
+			center.plus(new Location(xRadius, -yRadius))
+		);
 	}
 
-	this.move = function(target, speed, thresh) {
-		if(this.coverage == "man"){
-			if(target.loc.y <= thresh) {
-				this.slide(target);
+	this.moveMan = function(targets) {
+		targets.forEach(function(target) {
+			if(this.range.inRange(target){
+				this.chase(target, this.speed);
+				return;
 			}
-			else {
-				this.chase(target, speed);
-			}
-		}
-
-		if(this.coverage == "zone") {
-
-		}
+		});
 	}
+
 }
