@@ -29,7 +29,7 @@ $.get(url, function(response){
   console.log(response);
 })
 
-var myText = response.match(/<div id="nflbasics">\*<\/div>/);
+var myText = response.find(/<div id="nflbasics">\*<\/div>/);
 function test(){
   document.write(myText);
 }
