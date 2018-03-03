@@ -3,7 +3,6 @@ var Player = function(_name, _loc) {
 	this.loc = _loc;		
 	this.status = "free" 	//Could be free, blocked, ball, tackled
 	this.yards = 0; 		//how many yards made by player with the ball
-	this.end = false;		//at final position
 	this.index = 0;			//position into steps
 
 	this.steps = [this.loc];
@@ -20,35 +19,14 @@ var Player = function(_name, _loc) {
 	this.move = function() {
 		if(index < this.steps.length && this.status != "blocked" && this.status != "tackled") {
 			this.loc = this.steps[this.index];
-			this.index++;
 		}
-	}
-}
-
-var Location = function(_x, _y) {
-	this.x = _x;
-	this.y = _y;
-}
-
-var range = function(tl, br) {
-	this.topLeft = tl;
-	this.botRight = br;
-
-	this.inRange = function(target){
-		if(target.loc.x >= topLeft.x && target.loc.x <= botRight.x 
-			&& target.loc.y <= topLeft.y && target.loc.y >= botRight.y){
-
-			return true;
-		}
-
-		return false;
+		this.index++;	
 	}
 }
 
 var Defensive_Back_Man = function(_name, _loc, _coverage) {
 	Player.call(this, _name, _speed, _loc);
 
-	this.coverage = _coverage; //man or zone
 	this.speed = _speed;	// being distance per second
 
 	this.ROC = function(loc, dist) {  
@@ -61,6 +39,7 @@ var Defensive_Back_Man = function(_name, _loc, _coverage) {
 
 	this.chase = function(target) { 
 		this.loc.x = this.loc.x * this.ROC(target.loc, this.speed / 60);
+		this.loc.y = this.loc.y * this.ROC(target.loc, this.speed / 60);
 	}
 
 
@@ -77,18 +56,8 @@ var Defensive_Back_Man = function(_name, _loc, _coverage) {
 var Defensive_Back_Zone = function(_name, _loc, _coverage) {
 	Player.call(this, _name, _speed, _loc);
 
-	this.coverage = _coverage; //man or zone
 	this.speed = _speed;	// being distance per second
 	this.range;
-
-	this.ROC = function(loc, dist) {  
-		return (dist / Math.sqrt(Math.pow(loc.x, 2) + Math.pow(loc.y, 2) ) );
-	}
-
-
-	this.chase = function(target) { 
-		this.loc.x = this.loc.x * this.ROC(target.loc, this.speed / 60);
-	}
 
 	this.setRange = function(center, xRadius, yRadius) {
 		this.range = new range(
@@ -97,13 +66,47 @@ var Defensive_Back_Zone = function(_name, _loc, _coverage) {
 		);
 	}
 
+	this.ROC = function(loc, dist) {  
+		return (dist / Math.sqrt(Math.pow(loc.x, 2) + Math.pow(loc.y, 2) ) );
+	}
+
+
+	this.chase = function(target) { 
+		this.loc.x = this.loc.x * this.ROC(target.loc, this.speed / 60);
+		this.loc.y = this.loc.y * this.ROC(target.loc, this.speed / 60);
+	}
+
+
 	this.moveMan = function(targets) {
 		targets.forEach(function(target) {
 			if(this.range.inRange(target){
 				this.chase(target, this.speed);
 				return;
 			}
+			//else //DO
 		});
 	}
 
+}
+
+var Location = function(_x, _y) {
+	this.x = _x;
+	this.y = _y;
+
+	//ADD PLUS FUNCTION
+}
+
+var range = function(tl, br) {
+	this.topLeft = tl;
+	this.botRight = br;
+
+	this.inRange = function(target){
+		if(target.loc.x >= topLeft.x && target.loc.x <= botRight.x 
+			&& target.loc.y <= topLeft.y && target.loc.y >= botRight.y){
+
+			return true;
+		}
+
+		return false;
+	}
 }
