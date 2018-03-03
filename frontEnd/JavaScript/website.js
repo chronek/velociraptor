@@ -41,12 +41,14 @@ $(document).ready(function(){
 })
 //Loads FAQ onto the Home Page
 $(document).ready(function(){
-  $("#b1").click(function(e){
+  $("#raptor").click(function(e){
     e.preventDefault();
     var content = $("#faq").html();
     var content2 = $("#new-title").html();
-    $("#main-content").replaceWith('<div id="new-content">' + content + '</div');
-    $("#home-page").replaceWith('<h1 class="display-1">' + content2 + '</div');
+    var content3 = $("#new-header").html();
+    $("#old-header").replaceWith('<h5 class="display-5">' + content3 + '</h5');
+    $("#remove").replaceWith('<div>' + content + '</div>');
+    $("#home-page").replaceWith('<h1 class="display-1">' + content2 + '</h1');
   })
 })
 
