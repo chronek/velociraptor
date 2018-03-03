@@ -35,14 +35,13 @@ var Ball = function(play_type, QB) {
 
 	this.player = QB;
 	this.yards = -5;				//starting gain in yards at snap
+	this.steps = [];
+	this.index = 0;
 
 	this.handoff = function(newPlayer) {
 		this.player = newPlayer;
 	}
 
-	this.ROC = function(loc, dist) {  
-		return (dist / Math.sqrt(Math.pow(loc.x, 2) + Math.pow(loc.y, 2) ) );
-	}
 
 	this.down = function(player) {
 		if(this.thrown == true) {
@@ -56,11 +55,25 @@ var Ball = function(play_type, QB) {
 	}
 
 	this.throw = function(targetLoc) {
-		this.loc.x = this.loc.x + (targetLoc.x - this.loc.x) 
-			* this.ROC(targetLoc, this.speed / 60);
-			
-		this.loc.y = this.loc.y + (targetLoc.y - this.loc.y) 
-			* this.ROC(targetLoc,this.speed / 60);
+		if(this.thrown == false){
+			this.steps.push(this.player.loc);
+
+			for(int i = 1; i =< 90; i++) {
+				var newX = (targetLoc.x + ((this.player.loc.x - targetLoc.x) / 90) * i);
+				var newY = (targetLoc.y + ((this.player.loc.y - targetLoc.y) / 90) * i);
+				this.steps.push(new Location(newX, newY));
+			}
+		}
+	}
+
+	this.move = function() {
+		if(this.caught == true || this.thrown == false){
+			this.loc = this.player.loc;
+		}
+		else if(this.thrown == true){
+			this.loc = this.steps[this.index];
+			this.index++;	
+		}
 	}
 }
 
@@ -75,11 +88,6 @@ var Player = function(_name, _loc) {
 
 	this.addLeg = function(loc, time) {
 		var lastLoc = this.steps[this.steps.length - 1];
-		for(int i = 1; i =< time*60; i++) {
-			var newX = (lastLoc.x + ((loc.x - lastLoc.x) / (time * 60)) * i);
-			var newY = (lastLoc.y + ((loc.y - lastLoc.y) / (time * 60)) * i);
-			this.steps.push(new Location(newX, newY));
-		}
 	}
 
 	this.move = function() {
@@ -109,7 +117,7 @@ var Defensive_Back = function(_name, _speed, _loc) {
 }
 
 var Defensive_Back_Man = function(_name, _speed, _loc) {
-	Defensive_Back.call(this, _name, _loc);
+	Defensive_Back.call(this, _name, __speed, _loc);
 
 	this.slide = function(target) {
 		this.loc.x = target.loc.x();
@@ -126,7 +134,7 @@ var Defensive_Back_Man = function(_name, _speed, _loc) {
 }
 
 var Defensive_Back_Zone = function(_name, _speed, _loc, _coverage) {
-	Defensive_Back.call(this, _name, _loc);
+	Defensive_Back.call(this, _name, __speed, _loc);
 
 	this.range;
 
@@ -150,7 +158,34 @@ var Defensive_Back_Zone = function(_name, _speed, _loc, _coverage) {
 	}
 }
 
+var Quater_Back = function(_name, _loc, wait) {
+	Player.call(this, _name, _loc);
+	this.wait_time = wait;	//nums of secs to wait
+	this.index = 0;
 
+	this.throw = function(target, ball){
+		if(target.steps[target.index + 90] != undefined) {
+			ball.throw(target.steps[target.index + 90])
+		}
+	}
+
+	this.addLeg = function(loc, time) {
+		var lastLoc = this.steps[this.steps.length - 1];
+	}
+
+	this.action = function(play, ball, target){
+		if(play == "run" && this.wait_time == index) {
+			ball.handoff(target);
+		}
+		else if(ball.thrown == false && this.wait_time * 60 <= index) {
+			this.throw(target, ball);
+		}
+		if(index < this.steps.length && this.status != "tackled") {
+			this.loc = this.steps[this.index];
+		}
+		this.index++;
+	}
+}
 
 
 
