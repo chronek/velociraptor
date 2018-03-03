@@ -6,21 +6,21 @@ document.body.appendChild(app.view);
 
 // make texture
 var texture = PIXI.Texture.fromImage("light_green.jpg");
-
+var texture2 = PIXI.Texture.fromImage("dark_green.png");
 
 // use textures to make tiles
 var tile1 = new PIXI.TilingSprite(texture, width, height);
-var tile2 = new PIXI.TilingSprite(texture, width, height);
+var tile2 = new PIXI.TilingSprite(texture2, width, height);
 var tile3 = new PIXI.TilingSprite(texture, width, height);
-var tile4 = new PIXI.TilingSprite(texture, width, height);
+var tile4 = new PIXI.TilingSprite(texture2, width, height);
 var tile5 = new PIXI.TilingSprite(texture, width, height);
-var tile6 = new PIXI.TilingSprite(texture, width, height);
+var tile6 = new PIXI.TilingSprite(texture2, width, height);
 var tile7 = new PIXI.TilingSprite(texture, width, height);
-var tile8 = new PIXI.TilingSprite(texture, width, height);
+var tile8 = new PIXI.TilingSprite(texture2, width, height);
 var tile9 = new PIXI.TilingSprite(texture, width, height);
-var tile10 = new PIXI.TilingSprite(texture, width, height);
+var tile10 = new PIXI.TilingSprite(texture2, width, height);
 var tile11 = new PIXI.TilingSprite(texture, width, height);
-var tile12 = new PIXI.TilingSprite(texture, width, height);
+var tile12 = new PIXI.TilingSprite(texture2, width, height);
 
 // place tiles on board
 tile2.y = 50;
@@ -152,7 +152,7 @@ var vLine1 = new PIXI.Graphics();
 vLine1.lineStyle(line_height, 0xffffff, 1);
 vLine1.pivot.set(0, 0);
 vLine1.rotation = 0;
-vLine1.x = 400;
+vLine1.x = 150;
 vLine1.moveTo(0,0);
 vLine1.lineTo(0, 600);
 
@@ -161,7 +161,7 @@ var vLine2 = new PIXI.Graphics();
 vLine2.lineStyle(line_height, 0xffffff, 1);
 vLine2.pivot.set(0, 0);
 vLine2.rotation = 0;
-vLine2.x = 150;
+vLine2.x = 400;
 vLine2.moveTo(0, 0);
 vLine2.lineTo(0, 600);
 
