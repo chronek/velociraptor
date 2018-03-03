@@ -24,3 +24,8 @@ body {
 h1{
     font-size:60px;
 }
+
+.btn:hover{
+
+    background-color:#808080;
+}
