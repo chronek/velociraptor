@@ -47,6 +47,13 @@ body {
     color: rgb(156, 214, 185) !important;
   }
 
+.sim-link {
+  color: black;
+}
+.sim-link:hover {
+  color: black;
+}
+
 h5{
     color: 	#28333b;
 }
