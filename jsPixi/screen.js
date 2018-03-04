@@ -188,6 +188,11 @@ var Receiver = function(_name, _loc, _qb, _ball) {
 	}
 }
 
+var LineMan = function(_name, _loc, _ball) {
+	Player.call(this, _name, _loc);
+	this.ball = _ball;
+}
+
 var Defensive_Back = function(_name, _speed, _loc) {
 	Player.call(this, _name, _loc);
 
@@ -434,30 +439,66 @@ var Quarter_Back = function(_name, _loc, wait, _ball) {
 	var Sprites = [];
 	var objs = [];
 
-	objs.push(new Ball("pass"));
-	objs.push(new Quarter_Back("qb", new Location(width / 2 - 20, 680), 1, objs[0]));
-	objs.push(new Receiver("r1", new Location(125, 8 * height), objs[1], objs[0]));
-	objs.push(new Receiver("r2", new Location(225, 8 * height), objs[1], objs[0]));
-	objs.push(new Receiver("r3", new Location(width - 225, 8 * height), objs[1], objs[0]));
-	objs.push(new Receiver("r4", new Location(width - 125, 8 * height), objs[1], objs[0]));
-	objs.push(new Defensive_Back_Man('d1', 120, objs[2], new Location(125, 6 * height), objs[0] ));
-	objs.push(new Defensive_Back_Man('d2', 120, objs[3], new Location(225, 6 * height), objs[0]));
-	objs.push(new Defensive_Back_Man('d3', 120, objs[4], new Location(width - 225, 6 * height), objs[0]));
-	objs.push(new Defensive_Back_Man('d4', 120, objs[5], new Location(width - 125, 6 * height), objs[0]));
-	objs.push(new Defensive_Safety('s', 140, new Location((width / 2 - 20), 2.5 * height)));
+	var Look1 = function(){
+		objs.push(new Ball("pass"));
+		objs.push(new Quarter_Back("qb", new Location(width / 2 - 20, 10 * height - 40), 1, objs[0]));
+		objs.push(new Receiver("r1", new Location(125, 8 * height), objs[1], objs[0]));
+		objs.push(new Receiver("r2", new Location(225, 8 * height), objs[1], objs[0]));
+		objs.push(new Receiver("r3", new Location(width - 225, 8 * height), objs[1], objs[0]));
+		objs.push(new Receiver("r4", new Location(width - 125, 8 * height), objs[1], objs[0]));
+		objs.push(new Defensive_Back_Man('d1', 120, objs[2], new Location(125, 6 * height), objs[0] ));
+		objs.push(new Defensive_Back_Man('d2', 120, objs[3], new Location(225, 6 * height), objs[0]));
+		objs.push(new Defensive_Back_Man('d3', 120, objs[4], new Location(width - 225, 6 * height), objs[0]));
+		objs.push(new Defensive_Back_Man('d4', 120, objs[5], new Location(width - 125, 6 * height), objs[0]));
+		objs.push(new Defensive_Safety('s', 140, new Location((width / 2 - 20), 2.5 * height)));
+		objs.push(new LineMan("OL1", new Location(width / 2 - 120, 8 * height), objs[0]));
+		objs.push(new LineMan("OL2", new Location(width / 2 - 70, 8 * height), objs[0]));
+		objs.push(new LineMan("OL3", new Location(width / 2 - 20, 8 * height), objs[0]));
+		objs.push(new LineMan("OL4", new Location(width / 2 + 30, 8 * height), objs[0]));
+		objs.push(new LineMan("OL5", new Location(width / 2 + 80, 8 * height), objs[0]));
+		objs.push(new LineMan("DL1", new Location(width / 2 - 120, 8 * height - 55), objs[0]));
+		objs.push(new LineMan("DL2", new Location(width / 2 - 70, 8 * height - 55), objs[0]));
+		objs.push(new LineMan("DL3", new Location(width / 2 - 20, 8 * height - 55), objs[0]));
+		objs.push(new LineMan("DL4", new Location(width / 2 + 30, 8 * height - 55), objs[0]));
+		objs.push(new LineMan("DL5", new Location(width / 2 + 80, 8 * height - 55), objs[0]));
+		objs.push(new LineMan("DL6", new Location(width / 2 + 70, 8 * height - 100), objs[0]));
 
-	Sprites.push(PIXI.Sprite.fromImage("American_Football.png"));
-	Sprites.push(PIXI.Sprite.fromImage("Lol_circle.png"));
-	Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
-	Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
-	Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
-	Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
-	Sprites.push(PIXI.Sprite.fromImage("red-circle-hi.png"));
-	Sprites.push(PIXI.Sprite.fromImage("red-circle-hi.png"));
-	Sprites.push(PIXI.Sprite.fromImage("red-circle-hi.png"));
-	Sprites.push(PIXI.Sprite.fromImage("red-circle-hi.png"));
-	Sprites.push(PIXI.Sprite.fromImage("red-circle-hi.png"));
+		objs.push(new Running_Back("RB", new Location(width / 2 + 30, 10 * height - 40), objs[0]));
 
+
+
+		Sprites.push(PIXI.Sprite.fromImage("American_Football.png"));
+		Sprites.push(PIXI.Sprite.fromImage("Lol_circle.png"));
+		Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
+		Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
+		Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
+		Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
+		Sprites.push(PIXI.Sprite.fromImage("red-circle-hi.png"));
+		Sprites.push(PIXI.Sprite.fromImage("red-circle-hi.png"));
+		Sprites.push(PIXI.Sprite.fromImage("red-circle-hi.png"));
+		Sprites.push(PIXI.Sprite.fromImage("red-circle-hi.png"));
+		Sprites.push(PIXI.Sprite.fromImage("red-circle-hi.png"));
+
+		Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
+		Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
+		Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
+		Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
+		Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
+		Sprites.push(PIXI.Sprite.fromImage("red-circle-hi.png"));
+		Sprites.push(PIXI.Sprite.fromImage("red-circle-hi.png"));
+		Sprites.push(PIXI.Sprite.fromImage("red-circle-hi.png"));
+		Sprites.push(PIXI.Sprite.fromImage("red-circle-hi.png"));
+		Sprites.push(PIXI.Sprite.fromImage("red-circle-hi.png"));
+		Sprites.push(PIXI.Sprite.fromImage("red-circle-hi.png"));
+
+		Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
+	}
+
+	/* ~~~~~~~~~~~~~~ CHANGE CODE BELOW ~~~~~~~~~~~~~~ */
+
+	Look1();
+
+	/* ~~~~~~~~~~~~~~ CHANGE CODE ABOVE ~~~~~~~~~~~~~~ */
 
 	function loadSprites(_objs){
 		for(i = Sprites.length - 1; i >= 0 ; i--) {
@@ -476,22 +517,58 @@ var Quarter_Back = function(_name, _loc, wait, _ball) {
 		app.stage.addChild(Sprites[i]);
 	}
 
-	objs[2].addLeg(new Location(objs[2].loc.x - 120, 200), 4);
-	objs[2].addLeg(new Location(objs[2].loc.x - 120, 5), 1.5);
-	objs[3].addLeg(new Location(objs[3].loc.x, 500), 1);
-	objs[3].addLeg(new Location(objs[3].loc.x + 250, 450), 1.4);
-	objs[3].addLeg(new Location(objs[3].loc.x + 250, 0), 2);
-	objs[4].addLeg(new Location(objs[4].loc.x, 0), 3);
-	objs[5].addLeg(new Location(objs[5].loc.x + 85, 180), 3.5);
-	objs[5].addLeg(new Location(objs[5].loc.x + 85, 0), 1.4);
+	var set_Backs_Pass1 = function(){
+		objs[2].addLeg(new Location(objs[2].loc.x - 120, 200), 4);
+		objs[2].addLeg(new Location(objs[2].loc.x - 120, 5), 1.5);
+		objs[3].addLeg(new Location(objs[3].loc.x, 500), 1);
+		objs[3].addLeg(new Location(objs[3].loc.x + 250, 450), 1.4);
+		objs[3].addLeg(new Location(objs[3].loc.x + 250, 0), 2);
+		objs[4].addLeg(new Location(objs[4].loc.x, 0), 3);
+		objs[5].addLeg(new Location(objs[5].loc.x + 85, 180), 3.5);
+		objs[5].addLeg(new Location(objs[5].loc.x + 85, 0), 1.4);
+		objs[22].addLeg(new Location(objs[22].loc.x, objs[22].loc.y), .5);
+		objs[22].addLeg(new Location(objs[22].loc.x + 120, objs[22].loc.y + 15), .5);
+		objs[22].addLeg(new Location(objs[22].loc.x + 200, objs[22].loc.y -520), 2.25);
+	}
+
+	var set_Line_Pass = function(){
+		objs[11].addLeg(new Location(objs[11].loc.x, objs[11].loc.y + 80), .6);
+		objs[11].addLeg(new Location(objs[11].loc.x + 20, objs[11].loc.y + 110), 1);
+		objs[12].addLeg(new Location(objs[12].loc.x, objs[12].loc.y + 60), .9);
+		objs[13].addLeg(new Location(objs[13].loc.x, objs[13].loc.y + 45), .9);
+		objs[14].addLeg(new Location(objs[14].loc.x, objs[14].loc.y + 60), .9);
+		objs[15].addLeg(new Location(objs[15].loc.x, objs[12].loc.y + 80), .6);
+		objs[15].addLeg(new Location(objs[15].loc.x - 20, objs[15].loc.y + 110), 1);
+
+		objs[16].addLeg(new Location(objs[16].loc.x, objs[16].loc.y + 120), 1.5);
+		objs[17].addLeg(new Location(objs[17].loc.x, objs[17].loc.y + 70), 1.2);
+		objs[18].addLeg(new Location(objs[18].loc.x, objs[18].loc.y + 55), 1.2);
+		objs[19].addLeg(new Location(objs[19].loc.x, objs[19].loc.y + 70), 1.2);
+		objs[20].addLeg(new Location(objs[20].loc.x, objs[20].loc.y + 120), 1.5);
+
+		objs[21].addLeg(new Location(objs[21].loc.x + 10, objs[21].loc.y + 20), .75);
+		objs[21].addLeg(new Location(objs[21].loc.x + 90, objs[21].loc.y), .75);
+		objs[21].addLeg(new Location(objs[21].loc.x + 140, objs[21].loc.y - 360), 2);
+	}
 
 	var recv1 = objs[2];
 	var recv2 = objs[3];
 	var recv3 = objs[4];
 	var recv4 = objs[5];
 
+
+	/* ~~~~~~~~~~~~~~ CHANGE CODE BELOW ~~~~~~~~~~~~~~ */
+
+	set_Backs_Pass1();		//Backs Formation
+	set_Line_Pass();		//Line Formation
+
+
 	objs[0].setPlayer(objs[1]);
-	objs[1].setRecv(recv2);
+	objs[1].setRecv(recv4);
+
+	/* ~~~~~~~~~~~~~~ CHANGE CODE ABOVE ~~~~~~~~~~~~~~ */
+
+
 	for(i = 0; i < 4; i++) {
 		objs[i + 2].setDefs([objs[6], objs[7], objs[8], objs[9], objs[10]]);
 	}
