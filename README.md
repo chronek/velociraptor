@@ -31,5 +31,8 @@ Links to Dependencies:
 
 ## Visit the site
 http://velociraptorfootball.me/frontEnd/html/home.html - automatic!
-[Velociratporfootbal](http://velociraptorfootball.me/frontEnd/html/home.html)
+[Velociratporfootball](http://velociraptorfootball.me/frontEnd/html/home.html)
+
+http://github.com - automatic!
+[GitHub](http://github.com)
 
