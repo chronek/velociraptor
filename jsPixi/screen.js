@@ -1,3 +1,5 @@
+var End_Game = false;
+
 var Location = function(_x, _y) {
 	this.x = _x;
 	this.y = _y;
@@ -123,7 +125,7 @@ var Player = function(_name, _loc) {
 	}
 
 	this.move = function() {
-		if(this.index < this.steps.length && this.status != "blocked" && this.status != "tackled") {
+		if(this.index < this.steps.length && this.status != "tackled") {
 			this.loc = this.steps[this.index];
 		}
 		this.index++;
@@ -143,6 +145,12 @@ var Receiver = function(_name, _loc, _qb, _ball) {
 	Player.call(this, _name, _loc);
 	this.ball = _ball;
 	this.qb = _qb;
+	this.defs;
+	this.range;
+
+	this.setDefs = function(_defs){
+		this.defs = _defs;
+	}
 
 	this.catch = function() {
 		if(this.qb.recv == this && this.ball.ready == true && this.ball.caught == false){
@@ -150,7 +158,15 @@ var Receiver = function(_name, _loc, _qb, _ball) {
 			this.hasBall = true;
 			this.ball.caught = true;
 			this.ball.player = this;
+			this.setRange(new Location(this.loc.x + 20, this.loc.y + 20), 40, 40);
 		}
+	}
+
+	this.setRange = function(center, xRadius, yRadius) {
+		this.range = new range(
+			center.plus(new Location(-xRadius, -yRadius)),
+			center.plus(new Location(xRadius, yRadius))
+		);
 	}
 
 	this.action = function() {
@@ -158,7 +174,14 @@ var Receiver = function(_name, _loc, _qb, _ball) {
 		this.catch();
 
 		if(this.hasBall) {
-			this.range = 
+			for(j = 0; j < this.defs.length; j++) {
+				if(this.range.inRange(this.defs[j])) {
+					this.status = "tackled";
+					console.log("player tackled");
+					End_Game = true;
+				}
+			}
+
 		}
 	}
 }
@@ -172,13 +195,13 @@ var Defensive_Back = function(_name, _speed, _loc) {
 		return (dist / Math.sqrt(Math.pow(loc.x, 2) + Math.pow(loc.y, 2) ) );
 	}
 
-	this.chase = function(targetLoc, speed_multiplier) {
+	this.chase = function(targetLoc, x_multiplier, y_multiplier) {
 		newLoc = new Location((targetLoc.x - this.loc.x), (targetLoc.y - this.loc.y))
 		this.loc.x = this.loc.x + (newLoc.x
-			* this.ROC(targetLoc, speed_multiplier * (this.speed / 60)));
+			* this.ROC(targetLoc, x_multiplier * (this.speed / 60)));
 
 		this.loc.y = this.loc.y + (newLoc.y
-			* this.ROC(targetLoc, speed_multiplier * (this.speed / 60)));
+			* this.ROC(targetLoc, y_multiplier * (this.speed / 60)));
 	}
 
 	this.action = function() {
@@ -201,14 +224,14 @@ var Defensive_Back_Man = function(_name, _speed, _target, _loc, _ball) {
 			this.slide(this.target);
 		}
 		else {
-			this.chase(this.target.loc, 12);
+			this.chase(this.target.loc, 12, 12);
 		}
 	}
 
 	this.action = function() {
 		if(this.ball.caught) {
 			newLoc = new Location (this.ball.player.loc.x - 80, this.ball.player.loc.y -180);
-			this.chase(newLoc, .4);
+			this.chase(newLoc, .4, 6);
 		}
 		else {
 			this.move();
@@ -251,11 +274,11 @@ var Defensive_Saftey = function(_name, _speed, _loc) {
 			if(this.target.steps[this.target.index + this.lead] != undefined)
 				newLoc = this.target.steps[this.target.index + this.lead];
 			else newLoc = new Location(this.target.loc.x, this.target.loc.y - 80);
-			this.chase(newLoc, 1.2 + (50 - this.lead)/100);
+			this.chase(newLoc, 2, 1.2 + (50 - this.lead)/100);
 		}
 		else if(this.target.loc.y <= this.loc.y + height * 1.5) {
 			newLoc = this.target.steps[this.target.index + this.lead];
-			this.chase(newLoc, 2 + (30 - this.lead)/50);
+			this.chase(newLoc, 2, 2 + (30 - this.lead)/20);
 		}
 		if(this.lead > 10) {
 			this.lead--;
@@ -464,7 +487,10 @@ var Quarter_Back = function(_name, _loc, wait, _ball) {
 	var recv4 = objs[5];
 
 	objs[0].setPlayer(objs[1]);
-	objs[1].setRecv(recv2);
+	objs[1].setRecv(recv4);
+	for(i = 0; i < 4; i++) {
+		objs[i + 2].setDefs([objs[6], objs[7], objs[8], objs[9], objs[10]]);
+	}
 	objs[10].setRecvs([recv1, recv2, recv3, recv4]);
 
 
@@ -474,6 +500,6 @@ app.ticker.add(function(delta) {
 	for(i = 0; i < objs.length; i++) {
 		objs[i].action();
 	}
-
+	if(End_Game) return;
 	loadSprites(objs);
 });
