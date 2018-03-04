@@ -156,6 +156,10 @@ var Receiver = function(_name, _loc, _qb, _ball) {
 	this.action = function() {
 		this.move();
 		this.catch();
+
+		if(this.hasBall) {
+			this.range = 
+		}
 	}
 }
 
