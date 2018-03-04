@@ -1,7 +1,7 @@
 # Velociraptor
 
 A JavaScript web-based application that is meant to teach American Football. It can be used
-both to by newcomers and by Football coaches and teams to break down plays and strategies.
+both by newcomers and by Football coaches and teams to break down plays and strategies.
 The application features interactive simulations embedded in the web page to interact with
 plays. The learner can go step-by-step through each play and see the paths of each player.
 In addition users are able to play though a simulation and see the whole play in perspective.
