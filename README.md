@@ -28,3 +28,6 @@ Links to Dependencies:
 * https://jquery.com/
 * https://getbootstrap.com/
 * http://www.pixijs.com/
+
+## Visit the site
+http://velociraptorfootball.me/frontEnd/html/home.html
