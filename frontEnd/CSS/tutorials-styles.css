@@ -12,6 +12,15 @@ body {
   #raptor {
     margin-bottom: 10px;
   }
+  #main-content{
+      margin-left: 30px;
+      margin-top:20px;
+  }
+  #header{
+      margin-left:30px;
+      margin-top:20px;
+  }
+  
 
   
   /* The slow way */
