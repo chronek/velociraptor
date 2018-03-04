@@ -1,6 +1,17 @@
 body {
   font-family: 'Muli', sans-serif;
 }
+#logo {
+  font-family: 'Libre Baskerville', serif;
+  color: black;
+  border-bottom: 1px;
+  border-bottom-style: outset;
+  border-color: rgb(32, 96, 64);
+  margin-bottom: 10px;
+}
+#raptor {
+  margin-bottom: 10px;
+}
 
 /* The slow way */
 .make-it-slow {
@@ -23,6 +34,12 @@ body {
 .links:hover{
   color: rgb(156, 214, 185) !important;
 }
+/* #b1 {
+  background: white;
+  border: none;
+  width: 100%;
+  text-align: left;
+} */
 .hide {
   display: none;
 }
@@ -32,4 +49,8 @@ body {
 }
 .btn {
   background-color: white;
+}
+#faq,#new-title,#new-header {
+  display: none;
+  margin-right: 20px;
 }

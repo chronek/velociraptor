@@ -1,10 +1,17 @@
 body {
     font-family: 'Muli', sans-serif;
 }
-#logo h1{
-    /*color:#009900; */
-    
-}
+#logo {
+    font-family: 'Libre Baskerville', serif;
+    color: black;
+    border-bottom: 1px;
+    border-bottom-style: outset;
+    border-color: rgb(32, 96, 64);
+    margin-bottom: 10px;
+  }
+  #raptor {
+    margin-bottom: 10px;
+  }
 
   
   /* The slow way */
@@ -35,7 +42,7 @@ h5{
 
 .btn:hover{
 
-    background-color:#808080;
+    background-color:rgb(156, 214, 185);
 }
 .btn:focus,btn:active{
     outline: none !important;
