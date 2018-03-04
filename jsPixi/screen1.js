@@ -639,9 +639,9 @@ function play(){
 	var recv3 = objs[4];
 	var recv4 = objs[5];
 
-	var makeLine = function(s_coord, e_coord){
+var makeLine = function(s_coord, e_coord, color){
 		var Line1 = new PIXI.Graphics();
-		Line1.lineStyle(line_height * 2, 0xffff00, 1);
+		Line1.lineStyle(line_height * 2, color, 1);
 		Line1.pivot.set(0, 0);
 		Line1.rotation = 0;
 		Line1.x = 15;
@@ -651,18 +651,17 @@ function play(){
 	}
 
 	var Disp_Routes = function(){
-		makeLine(recv1.loc, Coords[0]);
-		makeLine(Coords[0], Coords[1]);
+		makeLine(recv1.loc, Coords[0], 0xffff00);
+		makeLine(Coords[0], Coords[1], 0xffff00);
 
-		makeLine(recv2.loc, Coords[2]);
-		makeLine(Coords[2], Coords[3]);
-		makeLine(Coords[3], Coords[4]);
+		makeLine(recv2.loc, Coords[2], 0xff1aff);
+		makeLine(Coords[2], Coords[3], 0xff1aff);
+		makeLine(Coords[3], Coords[4], 0xff1aff);
 
-		makeLine(recv3.loc, Coords[5]);
+		makeLine(recv3.loc, Coords[5], 0xffff00);
 
-
-		makeLine(recv4.loc, Coords[6]);
-		makeLine(Coords[6], Coords[7]);
+		makeLine(recv4.loc, Coords[6], 0xffff00);
+		makeLine(Coords[6], Coords[7], 0xffff00);
 
 
 		for(i = 0; i < PlayLines.length; i++) {
