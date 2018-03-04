@@ -31,14 +31,18 @@ var Ball = function(play_type) {
 		this.thrown = false;		// has the ball been thrown
 		this.caught = false;		// has the ball been caught
 	}
-  this.play = play_type;
+
+	this.play = play_type;
 	this.player;
 	this.yards = -5;				//starting gain in yards at snap
 	this.steps = [];
 	this.index = 0;
+	this.ready = false;
+	this.loc;
 
 	this.setPlayer = function(newPlayer) {
 		this.player = newPlayer;
+		this.loc = newPlayer.loc;
 	};
 
 	this.handoff = function(newPlayer) {
@@ -60,11 +64,13 @@ var Ball = function(play_type) {
 
 	this.throw = function(targetLoc) {
 		if(this.thrown == false){
+			//console.log("ball thrown");
+			this.thrown = true;
 			this.steps.push(this.player.loc);
 
 			for(i = 1; i <= 90; i++) {
-				var newX = (targetLoc.x + ((this.player.loc.x - targetLoc.x) / 90) * i);
-				var newY = (targetLoc.y + ((this.player.loc.y - targetLoc.y) / 90) * i);
+				var newX = (this.player.loc.x + ((targetLoc.x - this.player.loc.x) / 90) * i);
+				var newY = (this.player.loc.y + ((targetLoc.y - this.player.loc.y) / 90) * i);
 				this.steps.push(new Location(newX, newY));
 			}
 		}
@@ -75,9 +81,19 @@ var Ball = function(play_type) {
 			this.loc = this.player.loc;
 		}
 		else if(this.thrown == true){
-			this.loc = this.steps[this.index];
-			this.index++;
+			if(this.index >= this.steps.length - 1 && this.ready == false) {
+				//console.log("ball ready");
+				this.ready = true;
+			}
+			else {
+				this.loc = this.steps[this.index];
+				this.index++;
+			}
 		}
+	}
+
+	this.action = function() {
+		this.move();
 	}
 }
 
@@ -112,10 +128,35 @@ var Player = function(_name, _loc) {
 		}
 		this.index++;
 	}
+
+	this.action = function() {
+		this.move();
+	}
 }
 
-var Receiver = function(_name, _loc) {
+var Running_Back = function(_name, _loc, _ball) {
 	Player.call(this, _name, _loc);
+	this.ball = _ball;
+}
+
+var Receiver = function(_name, _loc, _qb, _ball) {
+	Player.call(this, _name, _loc);
+	this.ball = _ball;
+	this.qb = _qb;
+
+	this.catch = function() {
+		if(this.qb.recv == this && this.ball.ready == true && this.ball.caught == false){
+			console.log("player caught the ball");
+			this.hasBall = true;
+			this.ball.caught = true;
+			this.ball.player = this;
+		}
+	}
+
+	this.action = function() {
+		this.move();
+		this.catch();
+	}
 }
 
 var Defensive_Back = function(_name, _speed, _loc) {
@@ -133,6 +174,10 @@ var Defensive_Back = function(_name, _speed, _loc) {
 
 		this.loc.y = this.loc.y + ((targetLoc.y - this.loc.y)
 			* this.ROC(targetLoc, speed_multiplier * (this.speed / 60)));
+	}
+
+	this.action = function() {
+		this.move();
 	}
 }
 
@@ -152,6 +197,10 @@ var Defensive_Back_Man = function(_name, _speed, _target, _loc) {
 		else {
 			this.chase(this.target.loc, 12);
 		}
+	}
+
+	this.action = function() {
+		this.move();
 	}
 }
 
@@ -178,6 +227,10 @@ var Defensive_Back_Zone = function(_name, _speed, _loc, _coverage) {
 			}
 		});
 	}
+
+	this.action = function() {
+		this.move();
+	}
 }
 
 var Quarter_Back = function(_name, _loc, wait, _ball) {
@@ -186,7 +239,12 @@ var Quarter_Back = function(_name, _loc, wait, _ball) {
 	this.index = 0;
 	this.range;
 	this.ball = _ball;
-  this.hasBall = true;
+	this.hasBall = true;
+	this.recv;
+
+	this.setRecv = function(_recv) {
+		this.recv = _recv;
+	}
 
 	this.setRange = function() {
 		this.range = new range(
@@ -196,25 +254,30 @@ var Quarter_Back = function(_name, _loc, wait, _ball) {
 	}
 
 	this.throw = function(target){
+		//console.log("qb threw");
 		if(target.steps[target.index + 90] != undefined) {
 			this.ball.throw(target.steps[target.index + 90])
 		}
+		else {
+			this.ball.throw(target.steps[target.steps.length - 1])
+		}
 	}
 
-	this.action = function(target){
-		if(ball.play == "run" && this.wait_time <= this.index) {
+	this.action = function(){
+		if(this.ball.play == "run" && this.wait_time <= this.index) {
 			this.setRange();
-			if(this.range.inRange(target) && this.hasBall == true){
-				this.ball.handoff(target);
-        this.hasBall = false;
+			if(this.range.inRange(this.recv) && this.hasBall == true){
+				this.ball.handoff(this.recv);
+       			this.hasBall = false;
 			}
 			else {
 				this.play = "pass";
 				this.wait_time += 60;
 			}
 		}
-		if(this.ball.play == "pass" && this.ball.thrown == false && this.wait_time * 60 <= index) {
-			this.throw(target);
+		if(this.ball.play == "pass" && this.ball.thrown == false && this.wait_time <= this.index) {
+			//console.log("qb preparing to throw");
+			this.throw(this.recv);
 		}
 		if(this.index < this.steps.length && this.status != "tackled") {
 			this.loc = this.steps[this.index];
@@ -223,119 +286,130 @@ var Quarter_Back = function(_name, _loc, wait, _ball) {
 	}
 }
 
-var width = 770;
-var height = 70;
-var app = new PIXI.Application(width, 12 * height);
 
-document.body.appendChild(app.view);
+//init 1
+	var width = 770;
+	var height = 70;
+	var app = new PIXI.Application(width, 12 * height);
 
-// make textures
-var texture = PIXI.Texture.fromImage("light_green.jpg");
-var texture2 = PIXI.Texture.fromImage("dark_green.png");
+	document.body.appendChild(app.view);
 
-// create tiling sprites
-var tiles = [];
-for(i = 0; i < 12; i ++) {
-  if(i % 2 == 1) var tile = new PIXI.TilingSprite(texture2, width, height);
-  else var tile = new PIXI.TilingSprite(texture, width, height);
-  tile.y = height * i;
-  tiles.push(tile);
-}
+	// make textures
+	var texture = PIXI.Texture.fromImage("light_green.jpg");
+	var texture2 = PIXI.Texture.fromImage("dark_green.png");
 
-var line_height = 6;
-var add_y = line_height / 2;
-
-// create horizontal lines
-var Lines = [];
-for (i = 1; i < 12; i++) {
-  var line = new PIXI.Graphics();
-  line.lineStyle(line_height, 0xffffff, 1);
-  line.rotation = 1.5709;
-  line.x = width;
-  line.y = tiles[i].y + add_y;
-  line.moveTo(0,0);
-  line.lineTo(0, width);
-  Lines.push(line);
-}
-
-// vertical lines
-var vLine1 = new PIXI.Graphics();
-vLine1.lineStyle(line_height, 0xffffff, 1);
-vLine1.pivot.set(0, 0);
-vLine1.rotation = 0;
-vLine1.x = 250;
-vLine1.moveTo(0,0);
-vLine1.lineTo(0, height * 12);
-Lines.push(vLine1);
-
-var vLine2 = new PIXI.Graphics();
-vLine2.lineStyle(line_height, 0xffffff, 1);
-vLine2.pivot.set(0, 0);
-vLine2.rotation = 0;
-vLine2.x = 520;
-vLine2.moveTo(0, 0);
-vLine2.lineTo(0, height * 12);
-Lines.push(vLine2);
-
-// game
-var Sprites = [];
-var objs = [];
-
-var ball = new Ball("run");
-objs.push(new Quarter_Back("qb", new Location(width / 2 - 20, 700), 0, ball));
-objs.push(new Receiver("r1", new Location(125, 8 * height)));
-objs.push(new Receiver("r2", new Location(225, 8 * height)));
-objs.push(new Receiver("r3", new Location(width - 225, 8 * height)));
-objs.push(new Receiver("r4", new Location(width - 125, 8 * height)));
-objs.push(new Defensive_Back_Man('d1', 120, objs[1], new Location(125, 6 * height)));
-objs.push(new Defensive_Back_Man('d2', 120, objs[2], new Location(225, 6 * height)));
-objs.push(new Defensive_Back_Man('d3', 120, objs[3], new Location(width - 225, 6 * height)));
-objs.push(new Defensive_Back_Man('d4', 120, objs[4], new Location(width - 125, 6 * height)));
-
-
-Sprites.push(PIXI.Sprite.fromImage("Lol_circle.png"));
-Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
-Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
-Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
-Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
-Sprites.push(PIXI.Sprite.fromImage("red_thing.png"));
-Sprites.push(PIXI.Sprite.fromImage("red_thing.png"));
-Sprites.push(PIXI.Sprite.fromImage("red_thing.png"));
-Sprites.push(PIXI.Sprite.fromImage("red_thing.png"));
-
-function loadSprites(_objs){
-	for(i = 0; i < Sprites.length; i++) {
-		Sprites[i].x = _objs[i].loc.x;
-		Sprites[i].y = _objs[i].loc.y;
+	// create tiling sprites
+	var tiles = [];
+	for(i = 0; i < 12; i ++) {
+		if(i % 2 == 1) var tile = new PIXI.TilingSprite(texture2, width, height);
+		else var tile = new PIXI.TilingSprite(texture, width, height);
+		tile.y = height * i;
+		tiles.push(tile);
 	}
-}
 
-for(i = 0; i < 12; i++) {
-	app.stage.addChild(tiles[i]);
-}
-for(i = 0; i < 13; i++) {
-	app.stage.addChild(Lines[i]);
-}
-for(i = 0; i < Sprites.length; i++) {
-	app.stage.addChild(Sprites[i]);
-}
+	var line_height = 6;
+	var add_y = line_height / 2;
 
-objs[1].addLeg(new Location(objs[1].loc.x - 125, 200), 2);
-objs[1].addLeg(new Location(objs[1].loc.x - 125, 0), .75);
-objs[2].addLeg(new Location(objs[2].loc.x, 500), .5);
-objs[2].addLeg(new Location(objs[2].loc.x + 250, 450), .7);
-objs[2].addLeg(new Location(objs[2].loc.x + 250, 150), .7);
-objs[3].addLeg(new Location(objs[3].loc.x, 0), 1.5);
-objs[4].addLeg(new Location(objs[4].loc.x + 85, 180), 1.75);
-objs[4].addLeg(new Location(objs[4].loc.x + 85, 0), .70);
+	// create horizontal lines
+	var Lines = [];
+	for (i = 1; i < 12; i++) {
+		var line = new PIXI.Graphics();
+		line.lineStyle(line_height, 0xffffff, 1);
+		line.rotation = 1.5709;
+		line.x = width;
+		line.y = tiles[i].y + add_y;
+		line.moveTo(0,0);
+		line.lineTo(0, width);
+		Lines.push(line);
+	}
+
+	// vertical lines
+	var vLine1 = new PIXI.Graphics();
+	vLine1.lineStyle(line_height, 0xffffff, 1);
+	vLine1.pivot.set(0, 0);
+	vLine1.rotation = 0;
+	vLine1.x = 250;
+	vLine1.moveTo(0,0);
+	vLine1.lineTo(0, height * 12);
+	Lines.push(vLine1);
+
+	var vLine2 = new PIXI.Graphics();
+	vLine2.lineStyle(line_height, 0xffffff, 1);
+	vLine2.pivot.set(0, 0);
+	vLine2.rotation = 0;
+	vLine2.x = 520;
+	vLine2.moveTo(0, 0);
+	vLine2.lineTo(0, height * 12);
+	Lines.push(vLine2);
+
+//init 2
+
+	// game
+	var Sprites = [];
+	var objs = [];
+
+	objs.push(new Ball("pass"));
+	objs.push(new Quarter_Back("qb", new Location(width / 2 - 20, 680), .4, objs[0]));
+	objs.push(new Receiver("r1", new Location(125, 8 * height), objs[1], objs[0]));
+	objs.push(new Receiver("r2", new Location(225, 8 * height), objs[1], objs[0]));
+	objs.push(new Receiver("r3", new Location(width - 225, 8 * height), objs[1], objs[0]));
+	objs.push(new Receiver("r4", new Location(width - 125, 8 * height), objs[1], objs[0]));
+	objs.push(new Defensive_Back_Man('d1', 120, objs[2], new Location(125, 6 * height)));
+	objs.push(new Defensive_Back_Man('d2', 120, objs[3], new Location(225, 6 * height)));
+	objs.push(new Defensive_Back_Man('d3', 120, objs[4], new Location(width - 225, 6 * height)));
+	objs.push(new Defensive_Back_Man('d4', 120, objs[5], new Location(width - 125, 6 * height)));
+
+	Sprites.push(PIXI.Sprite.fromImage("American_Football.png"));
+	Sprites.push(PIXI.Sprite.fromImage("Lol_circle.png"));
+	Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
+	Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
+	Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
+	Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
+	Sprites.push(PIXI.Sprite.fromImage("red_thing.png"));
+	Sprites.push(PIXI.Sprite.fromImage("red_thing.png"));
+	Sprites.push(PIXI.Sprite.fromImage("red_thing.png"));
+	Sprites.push(PIXI.Sprite.fromImage("red_thing.png"));
+
+	function loadSprites(_objs){
+		for(i = Sprites.length - 1; i >= 0 ; i--) {
+			Sprites[i].x = _objs[i].loc.x;
+			Sprites[i].y = _objs[i].loc.y;
+		}
+	}
+
+	for(i = 0; i < 12; i++) {
+		app.stage.addChild(tiles[i]);
+	}
+	for(i = 0; i < 13; i++) {
+		app.stage.addChild(Lines[i]);
+	}
+	for(i = 0; i < Sprites.length; i++) {
+		app.stage.addChild(Sprites[i]);
+	}
+
+	objs[2].addLeg(new Location(objs[2].loc.x - 120, 200), 4);
+	objs[2].addLeg(new Location(objs[2].loc.x - 120, 5), 1.5);
+	objs[3].addLeg(new Location(objs[3].loc.x, 500), 1);
+	objs[3].addLeg(new Location(objs[3].loc.x + 250, 450), 1.4);
+	objs[3].addLeg(new Location(objs[3].loc.x + 250, 0), 2);
+	objs[4].addLeg(new Location(objs[4].loc.x, 0), 3);
+	objs[5].addLeg(new Location(objs[5].loc.x + 85, 180), 3.5);
+	objs[5].addLeg(new Location(objs[5].loc.x + 85, 0), 1.4);
+
+	var recv1 = 2;
+	var recv2 = 3;
+	var recv3 = 4;
+	var recv4 = 5;
+
+	objs[0].setPlayer(objs[1]);
+	objs[1].setRecv(objs[recv1]);
 
 
 app.ticker.add(function(delta) {
-	//console.log(dm.loc);
-	ball.move();
-	objs[0].action(objs[1]);
-	for(i = 1; i < objs.length; i++) {
-		objs[i].move();
+	console.log(objs[2].hasBall, objs[3].hasBall, objs[4].hasBall, objs[5].hasBall);
+
+	for(i = 0; i < objs.length; i++) {
+		objs[i].action();
 	}
 
 	loadSprites(objs);

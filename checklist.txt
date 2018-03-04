@@ -20,6 +20,12 @@ RB Object
 	@ - might take ball
 	@ - runs route
 
+Receiver Object
+	- 
+
+Saftey Object
+	- 
+
 Defensive_Back_Zone
 	- needs to choose which man in range he chases
 
