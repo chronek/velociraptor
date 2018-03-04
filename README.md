@@ -25,6 +25,6 @@ The simulations are built using the PixiJS Creation Engine based in HTML5.
 The front end is built using JQuery library and Bootstrap framework.
 
 Links to Dependencies:
-* (https://jquery.com/)
-* (https://getbootstrap.com/)
-* (http://www.pixijs.com/)
+* https://jquery.com/
+* https://getbootstrap.com/
+* http://www.pixijs.com/
