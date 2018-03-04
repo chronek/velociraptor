@@ -31,14 +31,18 @@ var Ball = function(play_type) {
 		this.thrown = false;		// has the ball been thrown
 		this.caught = false;		// has the ball been caught
 	}
-  this.play = play_type;
+
+	this.play = play_type;
 	this.player;
 	this.yards = -5;				//starting gain in yards at snap
 	this.steps = [];
 	this.index = 0;
+	this.ready = false;
+	this.loc;
 
 	this.setPlayer = function(newPlayer) {
 		this.player = newPlayer;
+		this.loc = newPlayer.loc;
 	};
 
 	this.handoff = function(newPlayer) {
@@ -60,11 +64,13 @@ var Ball = function(play_type) {
 
 	this.throw = function(targetLoc) {
 		if(this.thrown == false){
+			//console.log("ball thrown");
+			this.thrown = true;
 			this.steps.push(this.player.loc);
 
 			for(i = 1; i <= 90; i++) {
-				var newX = (targetLoc.x + ((this.player.loc.x - targetLoc.x) / 90) * i);
-				var newY = (targetLoc.y + ((this.player.loc.y - targetLoc.y) / 90) * i);
+				var newX = (this.player.loc.x + ((targetLoc.x - this.player.loc.x) / 90) * i);
+				var newY = (this.player.loc.y + ((targetLoc.y - this.player.loc.y) / 90) * i);
 				this.steps.push(new Location(newX, newY));
 			}
 		}
@@ -75,9 +81,19 @@ var Ball = function(play_type) {
 			this.loc = this.player.loc;
 		}
 		else if(this.thrown == true){
-			this.loc = this.steps[this.index];
-			this.index++;
+			if(this.index >= this.steps.length - 1 && this.ready == false) {
+				//console.log("ball ready");
+				this.ready = true;
+			}
+			else {
+				this.loc = this.steps[this.index];
+				this.index++;
+			}
 		}
+	}
+
+	this.action = function() {
+		this.move();
 	}
 }
 
@@ -87,16 +103,16 @@ var Player = function(_name, _loc) {
 	this.status = "free" 	//Could be free, blocked, ball, tackled
 	this.yards = 0; 		//how many yards made by player with the ball
 	this.index = 0;			//position into steps
-  this.hasBall = false;
+	this.hasBall = false;
 
-  this.steps = [this.loc];
+	this.steps = [this.loc];
 
 
-  this.takeBall = function() {
-    this.hasBall = true;
-  }
+	this.takeBall = function() {
+	this.hasBall = true;
+	}
 
-  this.addLeg = function(loc, time) {
+	this.addLeg = function(loc, time) {
 		var lastLoc = this.steps[this.steps.length - 1];
 
 		for(i = 1; i <= time * 60; i++) {
@@ -112,6 +128,35 @@ var Player = function(_name, _loc) {
 		}
 		this.index++;
 	}
+
+	this.action = function() {
+		this.move();
+	}
+}
+
+var Running_Back = function(_name, _loc, _ball) {
+	Player.call(this, _name, _loc);
+	this.ball = _ball;
+}
+
+var Receiver = function(_name, _loc, _qb, _ball) {
+	Player.call(this, _name, _loc);
+	this.ball = _ball;
+	this.qb = _qb;
+
+	this.catch = function() {
+		if(this.qb.recv == this && this.ball.ready == true && this.ball.caught == false){
+			console.log("player caught the ball");
+			this.hasBall = true;
+			this.ball.caught = true;
+			this.ball.player = this;
+		}
+	}
+
+	this.action = function() {
+		this.move();
+		this.catch();
+	}
 }
 
 var Defensive_Back = function(_name, _speed, _loc) {
@@ -124,27 +169,92 @@ var Defensive_Back = function(_name, _speed, _loc) {
 	}
 
 	this.chase = function(targetLoc, speed_multiplier) {
-		this.loc.x = this.loc.x + ((targetLoc.x - this.loc.x)
+		newLoc = new Location((targetLoc.x - this.loc.x), (targetLoc.y - this.loc.y))
+		this.loc.x = this.loc.x + (newLoc.x
 			* this.ROC(targetLoc, speed_multiplier * (this.speed / 60)));
 
-		this.loc.y = this.loc.y + ((targetLoc.y - this.loc.y)
+		this.loc.y = this.loc.y + (newLoc.y
 			* this.ROC(targetLoc, speed_multiplier * (this.speed / 60)));
+	}
+
+	this.action = function() {
+		this.move();
 	}
 }
 
-var Defensive_Back_Man = function(_name, _speed, _loc) {
+var Defensive_Back_Man = function(_name, _speed, _target, _loc, _ball) {
 	Defensive_Back.call(this, _name, _speed, _loc);
+	this.target = _target;
+	this.thresh = this.loc.y + 25;
+	this.ball = _ball;
 
-	this.slide = function(target) {
-		this.loc.x = target.loc.x;
+	this.slide = function() {
+		this.loc.x += 0.8 * (this.target.loc.x - this.loc.x);
 	}
 
-	this.move = function(target, thresh) {
-		if(target.loc.y >= thresh) {
-			this.slide(target);
+	this.move = function() {
+		if(this.target.loc.y >= this.thresh) {
+			this.slide(this.target);
 		}
 		else {
-			this.chase(target.loc, 12);
+			this.chase(this.target.loc, 12);
+		}
+	}
+
+	this.action = function() {
+		if(this.ball.caught) {
+			newLoc = new Location (this.ball.player.loc.x - 80, this.ball.player.loc.y -180);
+			this.chase(newLoc, .4);
+		}
+		else {
+			this.move();
+		}
+
+	}
+}
+
+var Defensive_Saftey = function(_name, _speed, _loc) {
+	Defensive_Back.call(this, _name, _speed, _loc);
+	this.recvs = [];
+	this.target;
+	this.lead = 60;
+	this.final = false;
+
+	this.setRecvs = function(_recvs){
+		this.recvs = _recvs;
+		this.target = this.recvs[0];
+	}
+
+	this.chooseTarget = function(){
+		if(this.final == false){
+			for(j = 0; j < this.recvs.length; j++) {
+				if(this.recvs[j].loc.y < this.target.loc.y) {
+					this.target = this.recvs[j];
+				}
+				if(this.recvs[j].hasBall == true){
+					this.target = this.recvs[j];
+					this.final = true;
+					this.lead = 30;
+					break;
+				}
+			}
+		}
+	}
+
+	this.action = function() {
+		this.chooseTarget();
+		if(this.target.hasBall) {
+			if(this.target.steps[this.target.index + this.lead] != undefined)
+				newLoc = this.target.steps[this.target.index + this.lead];
+			else newLoc = new Location(this.target.loc.x, this.target.loc.y - 80);
+			this.chase(newLoc, 1.2 + (50 - this.lead)/100);
+		}
+		else if(this.target.loc.y <= this.loc.y + height * 1.5) {
+			newLoc = this.target.steps[this.target.index + this.lead];
+			this.chase(newLoc, 2 + (30 - this.lead)/50);
+		}
+		if(this.lead > 10) {
+			this.lead--;
 		}
 	}
 }
@@ -172,6 +282,10 @@ var Defensive_Back_Zone = function(_name, _speed, _loc, _coverage) {
 			}
 		});
 	}
+
+	this.action = function() {
+		this.move();
+	}
 }
 
 var Quarter_Back = function(_name, _loc, wait, _ball) {
@@ -180,7 +294,12 @@ var Quarter_Back = function(_name, _loc, wait, _ball) {
 	this.index = 0;
 	this.range;
 	this.ball = _ball;
-  this.hasBall = true;
+	this.hasBall = true;
+	this.recv;
+
+	this.setRecv = function(_recv) {
+		this.recv = _recv;
+	}
 
 	this.setRange = function() {
 		this.range = new range(
@@ -190,25 +309,30 @@ var Quarter_Back = function(_name, _loc, wait, _ball) {
 	}
 
 	this.throw = function(target){
+		//console.log("qb threw");
 		if(target.steps[target.index + 90] != undefined) {
 			this.ball.throw(target.steps[target.index + 90])
 		}
+		else {
+			this.ball.throw(target.steps[target.steps.length - 1])
+		}
 	}
 
-	this.action = function(target){
-		if(ball.play == "run" && this.wait_time <= this.index) {
+	this.action = function(){
+		if(this.ball.play == "run" && this.wait_time <= this.index) {
 			this.setRange();
-			if(this.range.inRange(target) && this.hasBall == true){
-				this.ball.handoff(target);
-        this.hasBall = false;
+			if(this.range.inRange(this.recv) && this.hasBall == true){
+				this.ball.handoff(this.recv);
+       			this.hasBall = false;
 			}
 			else {
 				this.play = "pass";
 				this.wait_time += 60;
 			}
 		}
-		if(this.ball.play == "pass" && this.ball.thrown == false && this.wait_time * 60 <= index) {
-			this.throw(target);
+		if(this.ball.play == "pass" && this.ball.thrown == false && this.wait_time <= this.index) {
+			//console.log("qb preparing to throw");
+			this.throw(this.recv);
 		}
 		if(this.index < this.steps.length && this.status != "tackled") {
 			this.loc = this.steps[this.index];
@@ -217,128 +341,135 @@ var Quarter_Back = function(_name, _loc, wait, _ball) {
 	}
 }
 
-var width = 770;
-var height = 70;
-var app = new PIXI.Application(width, 12 * height);
 
-document.body.appendChild(app.view);
+//init 1
+	var width = 770;
+	var height = 70;
+	var app = new PIXI.Application(width, 12 * height);
 
-// make textures
-var texture = PIXI.Texture.fromImage("light_green.jpg");
-var texture2 = PIXI.Texture.fromImage("dark_green.png");
+	document.body.appendChild(app.view);
 
-// create tiling sprites
-var tiles = [];
-for(i = 0; i < 12; i ++) {
-  if(i % 2 == 1) var tile = new PIXI.TilingSprite(texture2, width, height);
-  else var tile = new PIXI.TilingSprite(texture, width, height);
-  tile.y = height * i;
-  tiles.push(tile);
-}
+	// make textures
+	var texture = PIXI.Texture.fromImage("light_green.jpg");
+	var texture2 = PIXI.Texture.fromImage("dark_green.png");
 
-var line_height = 6;
-var add_y = line_height / 2;
+	// create tiling sprites
+	var tiles = [];
+	for(i = 0; i < 12; i ++) {
+		if(i % 2 == 1) var tile = new PIXI.TilingSprite(texture2, width, height);
+		else var tile = new PIXI.TilingSprite(texture, width, height);
+		tile.y = height * i;
+		tiles.push(tile);
+	}
 
-// create horizontal lines
-var hLines = [];
-for (i = 1; i < 12; i++) {
-  var line = new PIXI.Graphics();
-  line.lineStyle(line_height, 0xffffff, 1);
-  line.rotation = 1.5709;
-  line.x = width;
-  line.y = tiles[i].y + add_y;
-  line.moveTo(0,0);
-  line.lineTo(0, width);
-  hLines.push(line);
-}
+	var line_height = 6;
+	var add_y = line_height / 2;
 
-// vertical lines
-var vLine1 = new PIXI.Graphics();
-vLine1.lineStyle(line_height, 0xffffff, 1);
-vLine1.pivot.set(0, 0);
-vLine1.rotation = 0;
-vLine1.x = 250;
-vLine1.moveTo(0,0);
-vLine1.lineTo(0, height * 12);
+	// create horizontal lines
+	var Lines = [];
+	for (i = 1; i < 12; i++) {
+		var line = new PIXI.Graphics();
+		line.lineStyle(line_height, 0xffffff, 1);
+		line.rotation = 1.5709;
+		line.x = width;
+		line.y = tiles[i].y + add_y;
+		line.moveTo(0,0);
+		line.lineTo(0, width);
+		Lines.push(line);
+	}
 
-var vLine2 = new PIXI.Graphics();
-vLine2.lineStyle(line_height, 0xffffff, 1);
-vLine2.pivot.set(0, 0);
-vLine2.rotation = 0;
-vLine2.x = 520;
-vLine2.moveTo(0, 0);
-vLine2.lineTo(0, height * 12);
+	// vertical lines
+	var vLine1 = new PIXI.Graphics();
+	vLine1.lineStyle(line_height, 0xffffff, 1);
+	vLine1.pivot.set(0, 0);
+	vLine1.rotation = 0;
+	vLine1.x = 250;
+	vLine1.moveTo(0,0);
+	vLine1.lineTo(0, height * 12);
+	Lines.push(vLine1);
 
-// game
-var ball = new Ball("run");
-var qb = new Quarter_Back("smith", new Location(275, 700), 0.1, ball);
-var rb = new Player("james", new Location(325, 700));
-var dm = new Defensive_Back_Man('brett', 120, new Location(325, 300));
-var rb2 = new Player("james", new Location(125, 700));
-var dm2 = new Defensive_Back_Man('brett', 120, new Location(125, 300));
+	var vLine2 = new PIXI.Graphics();
+	vLine2.lineStyle(line_height, 0xffffff, 1);
+	vLine2.pivot.set(0, 0);
+	vLine2.rotation = 0;
+	vLine2.x = 520;
+	vLine2.moveTo(0, 0);
+	vLine2.lineTo(0, height * 12);
+	Lines.push(vLine2);
 
-var dmSprite2 = PIXI.Sprite.fromImage("red_thing.png");
-dmSprite2.x = dm2.loc.x;
-dmSprite2.y = dm2.loc.y;
+//init 2
 
-var dmSprite = PIXI.Sprite.fromImage("red_thing.png");
-dmSprite.x = dm.loc.x;
-dmSprite.y = dm.loc.y;
+	// game
+	var Sprites = [];
+	var objs = [];
 
-var qbSprite = PIXI.Sprite.fromImage("Lol_circle.png");
-qbSprite.x = qb.loc.x;
-qbSprite.y = qb.loc.y;
+	objs.push(new Ball("pass"));
+	objs.push(new Quarter_Back("qb", new Location(width / 2 - 20, 680), 1, objs[0]));
+	objs.push(new Receiver("r1", new Location(125, 8 * height), objs[1], objs[0]));
+	objs.push(new Receiver("r2", new Location(225, 8 * height), objs[1], objs[0]));
+	objs.push(new Receiver("r3", new Location(width - 225, 8 * height), objs[1], objs[0]));
+	objs.push(new Receiver("r4", new Location(width - 125, 8 * height), objs[1], objs[0]));
+	objs.push(new Defensive_Back_Man('d1', 120, objs[2], new Location(125, 6 * height), objs[0] ));
+	objs.push(new Defensive_Back_Man('d2', 120, objs[3], new Location(225, 6 * height), objs[0]));
+	objs.push(new Defensive_Back_Man('d3', 120, objs[4], new Location(width - 225, 6 * height), objs[0]));
+	objs.push(new Defensive_Back_Man('d4', 120, objs[5], new Location(width - 125, 6 * height), objs[0]));
+	objs.push(new Defensive_Saftey('s', 140, new Location((width / 2 - 20), 2.5 * height)));
 
-// make sprite smaller
-qbSprite.scale.x = 0.8;
-qbSprite.scale.y = 0.8;
+	Sprites.push(PIXI.Sprite.fromImage("American_Football.png"));
+	Sprites.push(PIXI.Sprite.fromImage("Lol_circle.png"));
+	Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
+	Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
+	Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
+	Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
+	Sprites.push(PIXI.Sprite.fromImage("red-circle-hi.png"));
+	Sprites.push(PIXI.Sprite.fromImage("red-circle-hi.png"));
+	Sprites.push(PIXI.Sprite.fromImage("red-circle-hi.png"));
+	Sprites.push(PIXI.Sprite.fromImage("red-circle-hi.png"));
+	Sprites.push(PIXI.Sprite.fromImage("red-circle-hi.png"));
 
-var rbSprite = PIXI.Sprite.fromImage("Pan_Blue_Circle.png");
-rbSprite.x = rb.loc.x;
-rbSprite.y = rb.loc.y;
 
-// make sprite smaller
-rbSprite.scale.x = 0.8;
-rbSprite.scale.y = 0.8;
+	function loadSprites(_objs){
+		for(i = Sprites.length - 1; i >= 0 ; i--) {
+			Sprites[i].x = _objs[i].loc.x;
+			Sprites[i].y = _objs[i].loc.y;
+		}
+	}
 
-var rbSprite2 = PIXI.Sprite.fromImage("Pan_Blue_Circle.png");
-rbSprite2.x = rb2.loc.x;
-rbSprite2.y = rb2.loc.y;
+	for(i = 0; i < 12; i++) {
+		app.stage.addChild(tiles[i]);
+	}
+	for(i = 0; i < 13; i++) {
+		app.stage.addChild(Lines[i]);
+	}
+	for(i = 0; i < Sprites.length; i++) {
+		app.stage.addChild(Sprites[i]);
+	}
 
-// make sprite smaller
-rbSprite2.scale.x = 0.8;
-rbSprite2.scale.y = 0.8;
+	objs[2].addLeg(new Location(objs[2].loc.x - 120, 200), 4);
+	objs[2].addLeg(new Location(objs[2].loc.x - 120, 5), 1.5);
+	objs[3].addLeg(new Location(objs[3].loc.x, 500), 1);
+	objs[3].addLeg(new Location(objs[3].loc.x + 250, 450), 1.4);
+	objs[3].addLeg(new Location(objs[3].loc.x + 250, 0), 2);
+	objs[4].addLeg(new Location(objs[4].loc.x, 0), 3);
+	objs[5].addLeg(new Location(objs[5].loc.x + 85, 180), 3.5);
+	objs[5].addLeg(new Location(objs[5].loc.x + 85, 0), 1.4);
 
-// adding all the tiles
-app.stage.addChild(tiles[0], tiles[1], tiles[2], tiles[3], tiles[4], tiles[5]);
-app.stage.addChild(tiles[6], tiles[7], tiles[8], tiles[9], tiles[10], tiles[11]);
-app.stage.addChild(hLines[0], hLines[1], hLines[2], hLines[3], hLines[4]);
-app.stage.addChild(hLines[5], hLines[6], hLines[7], hLines[8], hLines[9], hLines[10]);
-app.stage.addChild(vLine1, vLine2);
+	var recv1 = objs[2];
+	var recv2 = objs[3];
+	var recv3 = objs[4];
+	var recv4 = objs[5];
 
-app.stage.addChild(qbSprite, rbSprite, dmSprite, dmSprite2, rbSprite2);
+	objs[0].setPlayer(objs[1]);
+	objs[1].setRecv(recv2);
+	objs[10].setRecvs([recv1, recv2, recv3, recv4]);
 
-qb.addLeg(new Location(qb.loc.x + 50, qb.loc.y - 100), 2)
-rb.addLeg(new Location(rb.loc.x + 200, rb.loc.y - 650), 3)
-rb2.addLeg(new Location(rb2.loc.x - 125, rb2.loc.y - 450), 3)
-rb2.addLeg(new Location(rb2.loc.x - 125, rb2.loc.y - 650), 1)
 
 app.ticker.add(function(delta) {
-  //console.log(dm.loc);
-  ball.move();
-  qb.action(rb);
-  rb.move();
-  dm.move(rb, 350);
-  rb2.move();
-  dm2.move(rb2, 350);
-  dmSprite.x = dm.loc.x;
-  dmSprite.y = dm.loc.y;
-  dmSprite2.x = dm2.loc.x;
-  dmSprite2.y = dm2.loc.y;
-  qbSprite.x = qb.loc.x;
-  qbSprite.y = qb.loc.y;
-  rbSprite2.x = rb2.loc.x;
-  rbSprite2.y = rb2.loc.y;
-  rbSprite.x = rb.loc.x;
-  rbSprite.y = rb.loc.y;
+	//console.log(objs[2].hasBall, objs[3].hasBall, objs[4].hasBall, objs[5].hasBall);
+
+	for(i = 0; i < objs.length; i++) {
+		objs[i].action();
+	}
+
+	loadSprites(objs);
 });
