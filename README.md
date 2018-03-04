@@ -6,7 +6,7 @@ The application features interactive simulations embedded in the web page to int
 plays. The learner can go step-by-step through each play and see the paths of each player.
 In addition users are able to play though a simulation and see the whole play in perspective.
 
-Authors:
+## Authors
 * Michael Upton
 * Eli Brunsvold
 * Brandon Garrard
@@ -14,18 +14,17 @@ Authors:
 
 Thanks to ehacks 2018 in St. Louis, MO for providing the space for development
 
-Services provided:
+## Services provided
 * Text to explain the core rules of Football
 * Videos and pictures to help visualize the game
 * Step-by-step simulations
 * Practice simulations to help learn the game
 
-This application is developed using only open source software.
-
+## Dependencies
 The simulations are built using the PixiJS Creation Engine based in HTML5.
 The front end is built using JQuery library and Bootstrap framework.
 
 Links to Dependencies:
-* [Link]https://jquery.com/
-* [Link]https://getbootstrap.com/
-* [Link]http://www.pixijs.com/
+* (https://jquery.com/)
+* (https://getbootstrap.com/)
+* (http://www.pixijs.com/)
