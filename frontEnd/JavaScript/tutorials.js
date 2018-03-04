@@ -8,12 +8,12 @@
 //       $(".row").show();
 //     }
 //   })
-// $(document).ready(function(){
-//   if ($(window).width() < 770){
-//     console.log("Hello Betch2");
-//     $("body").hide();
-//   }
-// })
+$(document).ready(function(){
+  if ($(window).width() < 770){
+    $("body").hide();
+    document.write("Screen to small to run simulation. Please use desktop.")
+  }
+})
 // $(document).ready(function(){
 //     if ($(window).width() < 770 && $(window).load()) {
 //         $("#main-content").hide();

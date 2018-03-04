@@ -41,12 +41,7 @@ body {
 .links:hover{
   color: rgb(156, 214, 185) !important;
 }
-/* #b1 {
-  background: white;
-  border: none;
-  width: 100%;
-  text-align: left;
-} */
+
 .hide {
   display: none;
 }
