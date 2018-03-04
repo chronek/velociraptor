@@ -6,7 +6,7 @@ $(document).ready(function(){
 })
 $(document).ready(function(){
   $("#img-field2").click(function(){
-    $("#img-tog2").toggle();
+    $("#img-tog2").toggle();  
   })
 })
 $(document).ready(function(){
