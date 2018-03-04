@@ -39,7 +39,7 @@ $(document).ready(function(){
     $("#video-tog4").toggle();
   })
 })
-//Loads FAQ onto the Home Page
+
 $(document).ready(function(){
   $("#raptor").click(function(e){
     e.preventDefault();
