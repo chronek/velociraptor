@@ -10,19 +10,20 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.5.1/pixi.min.js"></script>
     <link rel="stylesheet" href="../CSS/tutorials-styles.css">
-    <script src="../JavaScript/website.js"></script>
+    <!-- <script src="../JavaScript/website.js"></script> -->
+    <script src="../JavaScript/tutorials.js"></script>
+    <!-- <script src="../../jsPixi/pixi.mini.js"></script> -->
   </head>
   <body>
     <div class="container-fluid">
       <div class="row" id="logo">
-          <div class="col-lg-2">
-              <img id="raptor" src="../images/vraptor.png" alt="logo" width="200" height="200">
-            </div>
+        <div class="col-lg-2">
+          <img id="raptor" src="../images/vraptor.png" alt="logo" width="200" height="200">
+        </div>
         <div id="header" class="col-lg-9 col-sm-10">
           <h1 class="display-1">Tutorial</h1>
-        
-         
         </div>
 
       </div>
@@ -44,20 +45,17 @@
             </li>
           </ul>
         </div>
-
         <div id="main-content" class="col-lg-9 ">
-            <div>
-              <h5> Tutorial Instructions: <br> Find the offensive or defensive play that you would like to see and press "Run Simulation"
-                to learn about the play
-              </h5>
-              <br> 
+            <h5> Tutorial Instructions: <br> Find the offensive or defensive play that you would like to see and press "Run Simulation"
+              to learn about the play
+            </h5>
+            <br>
             <h5><strong><u>Offensive Plays</u></strong></h5>
             <p>Slant Route</p>
             <!-- insert the js of the play here -->
-                
-            <button class="btn make-it-slow">Run Simulation</button>
+            <a href="simulation1.html" id="simulation1" class="btn make-it-slow sim-link">Run Simulation</a>
             <br>
-            <br>    
+            <br>
             <p>Go Route</p>
             <!-- insert the js of the play here -->
             <button class="btn make-it-slow">Run Simulation</button>
@@ -67,7 +65,7 @@
             <h5><strong><u>Defensive Plays</u></strong></h5>
             <p>Man to Man Coverage</p>
             <!-- insert the js of the play here -->
-                
+
             <button class="btn make-it-slow">Run Simulation</button>
             <br>
             <br>
@@ -75,9 +73,7 @@
             <!-- insert the js of the play here -->
             <button class="btn make-it-slow">Run Simulation</button>
             <hr>
-            
-            
-        </div>
+          </div>
         </div>
       </div>
     </div>
