@@ -20,7 +20,7 @@ var range = function(tl, br) {
 	this.inRange = function(target){
 		//console.log(target.loc.x, this.topLeft.x);
 		if(target.loc.x + 20 >= this.topLeft.x && target.loc.x <= this.botRight.x
-			&& target.loc.y + 20 >= this.topLeft.y && target.loc.y <= this.botRight.y){
+			&& target.loc.y >= this.topLeft.y && target.loc.y <= this.botRight.y){
 
 			return true;
 		}
@@ -159,7 +159,7 @@ var Receiver = function(_name, _loc, _qb, _ball) {
 			this.hasBall = true;
 			this.ball.caught = true;
 			this.ball.player = this;
-			this.setRange(new Location(this.loc.x + 20, this.loc.y + 20), 15, 15);
+			this.setRange(new Location(this.loc.x + 20, this.loc.y), 15, 15);
 		}
 	}
 
@@ -562,30 +562,24 @@ function play(){
 	app.stage.addChild(but1);
 	app.stage.addChild(but2);
 
-	var set_Backs_Pass1 = function(){
-		Coords.push(new Location(objs[2].loc.x - 120, 200));					//[0] recv1
-		Coords.push(new Location(objs[2].loc.x - 120, 5));						//[1] recv1
-		Coords.push(new Location(objs[3].loc.x, 500));							//[2] recv2
-		Coords.push(new Location(objs[3].loc.x + 250, 450));					//[3] recv2
-		Coords.push(new Location(objs[3].loc.x + 250, 0));						//[4] recv2
-		Coords.push(new Location(objs[4].loc.x, 0));							//[5] recv3
-		Coords.push(new Location(objs[5].loc.x + 85, 180));						//[6] recv4
-		Coords.push(new Location(objs[5].loc.x + 85, 0));						//[7] recv4
+	var set_Backs_Pass2 = function(){
+		Coords.push(new Location(objs[2].loc.x - 20, 0));					//[0] recv1
+		Coords.push(new Location(objs[3].loc.x - 10, 0));							//[2] recv2
+		Coords.push(new Location(objs[4].loc.x + 10, 0));						//[5] recv3
+		Coords.push(new Location(objs[5].loc.x + 20, 0));						//[6] recv4
+
 		Coords.push(new Location(objs[22].loc.x, objs[22].loc.y));				//[8] RB
-		Coords.push(new Location(objs[22].loc.x + 120, objs[22].loc.y + 15));	//[9] RB
-		Coords.push(new Location(objs[22].loc.x + 200, objs[22].loc.y -520));	//[10]RB
+		Coords.push(new Location(objs[22].loc.x - 120, objs[22].loc.y));	//[9] RB
+		Coords.push(new Location(objs[22].loc.x - 200, objs[22].loc.y -520));	//[10]RB
 
 		objs[2].addLeg(Coords[0], 4);
-		objs[2].addLeg(Coords[1], 1.5);
-		objs[3].addLeg(Coords[2], 1);
-		objs[3].addLeg(Coords[3], 1.4);
-		objs[3].addLeg(Coords[4], 2);
-		objs[4].addLeg(Coords[5], 3);
-		objs[5].addLeg(Coords[6], 3.5);
-		objs[5].addLeg(Coords[7], 1.4);
-		objs[22].addLeg(Coords[8], .5);
-		objs[22].addLeg(Coords[9], .5);
-		objs[22].addLeg(Coords[10], 2.25);
+		objs[3].addLeg(Coords[1], 2.8);
+		objs[4].addLeg(Coords[2], 3);
+		objs[5].addLeg(Coords[3], 3.5);
+
+		objs[22].addLeg(Coords[4], .2);
+		objs[22].addLeg(Coords[5], .7);
+		objs[22].addLeg(Coords[6], 2.25);
 	}
 
 	var set_Line_Pass = function(){
@@ -608,23 +602,23 @@ function play(){
 		Coords.push(new Location(objs[21].loc.x + 140, objs[21].loc.y - 360));
 		
 
-		objs[11].addLeg(Coords[11], .6);
-		objs[11].addLeg(Coords[12], 1);
-		objs[12].addLeg(Coords[13], .9);
-		objs[13].addLeg(Coords[14], .9);
-		objs[14].addLeg(Coords[15], .9);
-		objs[15].addLeg(Coords[16], .6);
-		objs[15].addLeg(Coords[17], 1);
+		objs[11].addLeg(Coords[7], .6);
+		objs[11].addLeg(Coords[8], 1);
+		objs[12].addLeg(Coords[9], .9);
+		objs[13].addLeg(Coords[10], .9);
+		objs[14].addLeg(Coords[11], .9);
+		objs[15].addLeg(Coords[12], .6);
+		objs[15].addLeg(Coords[13], 1);
 
-		objs[16].addLeg(Coords[18], 1.5);
-		objs[17].addLeg(Coords[19], 1.2);
-		objs[18].addLeg(Coords[20], 1.2);
-		objs[19].addLeg(Coords[21], 1.2);
-		objs[20].addLeg(Coords[22], 1.5);
+		objs[16].addLeg(Coords[14], 1.5);
+		objs[17].addLeg(Coords[15], 1.2);
+		objs[18].addLeg(Coords[16], 1.2);
+		objs[19].addLeg(Coords[17], 1.2);
+		objs[20].addLeg(Coords[18], 1.5);
 
-		objs[21].addLeg(Coords[23], .75);
-		objs[21].addLeg(Coords[24], .75);
-		objs[21].addLeg(Coords[25], 2);
+		objs[21].addLeg(Coords[19], .75);
+		objs[21].addLeg(Coords[20], .75);
+		objs[21].addLeg(Coords[21], 2);
 	}
 
 	var recv1 = objs[2];
@@ -632,9 +626,9 @@ function play(){
 	var recv3 = objs[4];
 	var recv4 = objs[5];
 
-	var makeLine = function(s_coord, e_coord){
+	var makeLine = function(s_coord, e_coord, color){
 		var Line1 = new PIXI.Graphics();
-		Line1.lineStyle(line_height * 2, 0xffff00, 1);
+		Line1.lineStyle(line_height * 2, color, 1);
 		Line1.pivot.set(0, 0);
 		Line1.rotation = 0;
 		Line1.x = 15;
@@ -644,18 +638,14 @@ function play(){
 	}
 
 	var Disp_Routes = function(){
-		makeLine(recv1.loc, Coords[0]);
-		makeLine(Coords[0], Coords[1]);
+		makeLine(recv1.loc, Coords[0], 0xffff00);
 
-		makeLine(recv2.loc, Coords[2]);
-		makeLine(Coords[2], Coords[3]);
-		makeLine(Coords[3], Coords[4]);
+		makeLine(recv2.loc, Coords[1], 0xffff00);
 
-		makeLine(recv3.loc, Coords[5]);
+		makeLine(recv3.loc, Coords[2], 0xff1aff);
 
+		makeLine(recv4.loc, Coords[3], 0xffff00);
 
-		makeLine(recv4.loc, Coords[6]);
-		makeLine(Coords[6], Coords[7]);
 
 
 		for(i = 0; i < PlayLines.length; i++) {
@@ -673,12 +663,12 @@ function play(){
 
 	/* ~~~~~~~~~~~~~~ CHANGE CODE BELOW ~~~~~~~~~~~~~~ */
 
-	set_Backs_Pass1();		//Backs Formation
+	set_Backs_Pass2();		//Backs Formation
 	set_Line_Pass();		//Line Formation
 
 
 	objs[0].setPlayer(objs[1]);
-	objs[1].setRecv(recv2);
+	objs[1].setRecv(recv3);
 
 	/* ~~~~~~~~~~~~~~ CHANGE CODE ABOVE ~~~~~~~~~~~~~~ */
 
