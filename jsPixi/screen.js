@@ -18,8 +18,9 @@ var range = function(tl, br) {
 		+ tl.x, ((tl.y - br.y) / 2) + br.y);
 
 	this.inRange = function(target){
-		if(target.loc.x >= this.topLeft.x && target.loc.x <= this.botRight.x
-			&& target.loc.y >= this.topLeft.y && target.loc.y <= this.botRight.y){
+		//console.log(target.loc.x, this.topLeft.x);
+		if(target.loc.x + 20 >= this.topLeft.x && target.loc.x <= this.botRight.x
+			&& target.loc.y + 20 >= this.topLeft.y && target.loc.y <= this.botRight.y){
 
 			return true;
 		}
@@ -158,7 +159,7 @@ var Receiver = function(_name, _loc, _qb, _ball) {
 			this.hasBall = true;
 			this.ball.caught = true;
 			this.ball.player = this;
-			this.setRange(new Location(this.loc.x + 20, this.loc.y + 20), 40, 40);
+			this.setRange(new Location(this.loc.x + 20, this.loc.y + 20), 15, 15);
 		}
 	}
 
@@ -179,6 +180,7 @@ var Receiver = function(_name, _loc, _qb, _ball) {
 					this.status = "tackled";
 					console.log("player tackled");
 					End_Game = true;
+					break;
 				}
 			}
 
@@ -230,7 +232,9 @@ var Defensive_Back_Man = function(_name, _speed, _target, _loc, _ball) {
 
 	this.action = function() {
 		if(this.ball.caught) {
-			newLoc = new Location (this.ball.player.loc.x - 80, this.ball.player.loc.y -180);
+			if(this.ball.player.loc.x <= width /2) 
+				newLoc = new Location (this.ball.player.loc.x - 80, this.ball.player.loc.y -180);
+			else newLoc = new Location (this.ball.player.loc.x + 80, this.ball.player.loc.y -180);
 			this.chase(newLoc, .4, 6);
 		}
 		else {
@@ -240,7 +244,7 @@ var Defensive_Back_Man = function(_name, _speed, _target, _loc, _ball) {
 	}
 }
 
-var Defensive_Saftey = function(_name, _speed, _loc) {
+var Defensive_Safety = function(_name, _speed, _loc) {
 	Defensive_Back.call(this, _name, _speed, _loc);
 	this.recvs = [];
 	this.target;
@@ -440,7 +444,7 @@ var Quarter_Back = function(_name, _loc, wait, _ball) {
 	objs.push(new Defensive_Back_Man('d2', 120, objs[3], new Location(225, 6 * height), objs[0]));
 	objs.push(new Defensive_Back_Man('d3', 120, objs[4], new Location(width - 225, 6 * height), objs[0]));
 	objs.push(new Defensive_Back_Man('d4', 120, objs[5], new Location(width - 125, 6 * height), objs[0]));
-	objs.push(new Defensive_Saftey('s', 140, new Location((width / 2 - 20), 2.5 * height)));
+	objs.push(new Defensive_Safety('s', 140, new Location((width / 2 - 20), 2.5 * height)));
 
 	Sprites.push(PIXI.Sprite.fromImage("American_Football.png"));
 	Sprites.push(PIXI.Sprite.fromImage("Lol_circle.png"));
@@ -468,7 +472,7 @@ var Quarter_Back = function(_name, _loc, wait, _ball) {
 	for(i = 0; i < 13; i++) {
 		app.stage.addChild(Lines[i]);
 	}
-	for(i = 0; i < Sprites.length; i++) {
+	for(i = Sprites.length - 1; i >= 0 ; i--) {
 		app.stage.addChild(Sprites[i]);
 	}
 
@@ -487,7 +491,7 @@ var Quarter_Back = function(_name, _loc, wait, _ball) {
 	var recv4 = objs[5];
 
 	objs[0].setPlayer(objs[1]);
-	objs[1].setRecv(recv4);
+	objs[1].setRecv(recv2);
 	for(i = 0; i < 4; i++) {
 		objs[i + 2].setDefs([objs[6], objs[7], objs[8], objs[9], objs[10]]);
 	}
