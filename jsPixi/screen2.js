@@ -176,9 +176,10 @@ var Receiver = function(_name, _loc, _qb, _ball) {
 
 		if(this.hasBall) {
 			for(j = 0; j < this.defs.length; j++) {
-				if(this.range.inRange(this.defs[j])) {
+				if(this.range.inRange(this.defs[j]) && this.status != "tackled") {
 					this.status = "tackled";
 					console.log("player tackled");
+					app.ticker.stop();
 					End_Game = true;
 					break;
 				}
@@ -398,6 +399,7 @@ var Quarter_Back = function(_name, _loc, wait, _ball) {
 		tiles.push(tile);
 	}
 
+
 	var line_height = 6;
 	var add_y = line_height / 2;
 
@@ -434,12 +436,15 @@ var Quarter_Back = function(_name, _loc, wait, _ball) {
 	Lines.push(vLine2);
 
 //init 2
+function play(){
 
 	// game
 	var Sprites = [];
 	var objs = [];
+	var Coords = [];
+	var PlayLines = [];
 
-	var Look1 = function(){
+	var Look2 = function(){
 		objs.push(new Ball("pass"));
 		objs.push(new Quarter_Back("qb", new Location(width / 2 - 20, 10 * height - 40), 1, objs[0]));
 		objs.push(new Receiver("r1", new Location(125, 8 * height), objs[1], objs[0]));
@@ -456,14 +461,16 @@ var Quarter_Back = function(_name, _loc, wait, _ball) {
 		objs.push(new LineMan("OL3", new Location(width / 2 - 20, 8 * height), objs[0]));
 		objs.push(new LineMan("OL4", new Location(width / 2 + 30, 8 * height), objs[0]));
 		objs.push(new LineMan("OL5", new Location(width / 2 + 80, 8 * height), objs[0]));
-		objs.push(new LineMan("DL1", new Location(width / 2 - 120, 8 * height - 55), objs[0]));
-		objs.push(new LineMan("DL2", new Location(width / 2 - 70, 8 * height - 55), objs[0]));
-		objs.push(new LineMan("DL3", new Location(width / 2 - 20, 8 * height - 55), objs[0]));
-		objs.push(new LineMan("DL4", new Location(width / 2 + 30, 8 * height - 55), objs[0]));
-		objs.push(new LineMan("DL5", new Location(width / 2 + 80, 8 * height - 55), objs[0]));
+
+		objs.push(new LineMan("DL1", new Location(width / 2 - 95, 8 * height - 55), objs[0]));
+		objs.push(new LineMan("DL2", new Location(width / 2 - 45, 8 * height - 55), objs[0]));
+		objs.push(new LineMan("DL3", new Location(width / 2 + 5, 8 * height - 55), objs[0]));
+		objs.push(new LineMan("DL4", new Location(width / 2 + 55, 8 * height - 55), objs[0]));
+
+		objs.push(new LineMan("DL5", new Location(width / 2 - 110, 8 * height - 100), objs[0]));
 		objs.push(new LineMan("DL6", new Location(width / 2 + 70, 8 * height - 100), objs[0]));
 
-		objs.push(new Running_Back("RB", new Location(width / 2 + 30, 10 * height - 40), objs[0]));
+		objs.push(new Running_Back("RB", new Location(width / 2 - 70, 10 * height - 40), objs[0]));
 
 
 
@@ -492,69 +499,176 @@ var Quarter_Back = function(_name, _loc, wait, _ball) {
 		Sprites.push(PIXI.Sprite.fromImage("red-circle-hi.png"));
 
 		Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
+
 	}
 
 	/* ~~~~~~~~~~~~~~ CHANGE CODE BELOW ~~~~~~~~~~~~~~ */
 
-	Look1();
+	Look2();
+
+	var but1 = PIXI.Sprite.fromImage("reset_arrow.png");
+	var but2 = PIXI.Sprite.fromImage("next_arrow.png");
+
+	var task1 = function(){
+		End_Game = false;
+		task2();
+		play();
+	}
+
+	but1.interactive = true;
+	but1.buttonMode = true;
+	but1.on("click", task1);
+
+	var task2 = function(){
+		if(index >= 4) {
+			Clear_Routes();
+			console.log("clear routes");
+		}
+		index++;
+		app.ticker.start(); 
+	}
+
+	but2.interactive = true;
+	but2.buttonMode = true;
+	but2.on("click", task2);
+
+
 
 	/* ~~~~~~~~~~~~~~ CHANGE CODE ABOVE ~~~~~~~~~~~~~~ */
 
 	function loadSprites(_objs){
-		for(i = Sprites.length - 1; i >= 0 ; i--) {
+		for(i = _objs.length - 1; i >= 0 ; i--) {
 			Sprites[i].x = _objs[i].loc.x;
 			Sprites[i].y = _objs[i].loc.y;
 		}
 	}
 
-	for(i = 0; i < 12; i++) {
+	but1.x = 10;
+	but1.y = height * 10.1;
+	but2.x = (width / 4) * 3 - 10;
+	but2.y = height * 10.1;
+
+
+	for(i = 0; i < tiles.length; i++) {
 		app.stage.addChild(tiles[i]);
 	}
-	for(i = 0; i < 13; i++) {
+	for(i = 0; i < Lines.length; i++) {
 		app.stage.addChild(Lines[i]);
 	}
 	for(i = Sprites.length - 1; i >= 0 ; i--) {
 		app.stage.addChild(Sprites[i]);
 	}
 
+	app.stage.addChild(but1);
+	app.stage.addChild(but2);
+
 	var set_Backs_Pass1 = function(){
-		objs[2].addLeg(new Location(objs[2].loc.x - 120, 200), 4);
-		objs[2].addLeg(new Location(objs[2].loc.x - 120, 5), 1.5);
-		objs[3].addLeg(new Location(objs[3].loc.x, 500), 1);
-		objs[3].addLeg(new Location(objs[3].loc.x + 250, 450), 1.4);
-		objs[3].addLeg(new Location(objs[3].loc.x + 250, 0), 2);
-		objs[4].addLeg(new Location(objs[4].loc.x, 0), 3);
-		objs[5].addLeg(new Location(objs[5].loc.x + 85, 180), 3.5);
-		objs[5].addLeg(new Location(objs[5].loc.x + 85, 0), 1.4);
-		objs[22].addLeg(new Location(objs[22].loc.x, objs[22].loc.y), .5);
-		objs[22].addLeg(new Location(objs[22].loc.x + 120, objs[22].loc.y + 15), .5);
-		objs[22].addLeg(new Location(objs[22].loc.x + 200, objs[22].loc.y -520), 2.25);
+		Coords.push(new Location(objs[2].loc.x - 120, 200));					//[0] recv1
+		Coords.push(new Location(objs[2].loc.x - 120, 5));						//[1] recv1
+		Coords.push(new Location(objs[3].loc.x, 500));							//[2] recv2
+		Coords.push(new Location(objs[3].loc.x + 250, 450));					//[3] recv2
+		Coords.push(new Location(objs[3].loc.x + 250, 0));						//[4] recv2
+		Coords.push(new Location(objs[4].loc.x, 0));							//[5] recv3
+		Coords.push(new Location(objs[5].loc.x + 85, 180));						//[6] recv4
+		Coords.push(new Location(objs[5].loc.x + 85, 0));						//[7] recv4
+		Coords.push(new Location(objs[22].loc.x, objs[22].loc.y));				//[8] RB
+		Coords.push(new Location(objs[22].loc.x + 120, objs[22].loc.y + 15));	//[9] RB
+		Coords.push(new Location(objs[22].loc.x + 200, objs[22].loc.y -520));	//[10]RB
+
+		objs[2].addLeg(Coords[0], 4);
+		objs[2].addLeg(Coords[1], 1.5);
+		objs[3].addLeg(Coords[2], 1);
+		objs[3].addLeg(Coords[3], 1.4);
+		objs[3].addLeg(Coords[4], 2);
+		objs[4].addLeg(Coords[5], 3);
+		objs[5].addLeg(Coords[6], 3.5);
+		objs[5].addLeg(Coords[7], 1.4);
+		objs[22].addLeg(Coords[8], .5);
+		objs[22].addLeg(Coords[9], .5);
+		objs[22].addLeg(Coords[10], 2.25);
 	}
 
 	var set_Line_Pass = function(){
-		objs[11].addLeg(new Location(objs[11].loc.x, objs[11].loc.y + 80), .6);
-		objs[11].addLeg(new Location(objs[11].loc.x + 20, objs[11].loc.y + 110), 1);
-		objs[12].addLeg(new Location(objs[12].loc.x, objs[12].loc.y + 60), .9);
-		objs[13].addLeg(new Location(objs[13].loc.x, objs[13].loc.y + 45), .9);
-		objs[14].addLeg(new Location(objs[14].loc.x, objs[14].loc.y + 60), .9);
-		objs[15].addLeg(new Location(objs[15].loc.x, objs[12].loc.y + 80), .6);
-		objs[15].addLeg(new Location(objs[15].loc.x - 20, objs[15].loc.y + 110), 1);
+		Coords.push(new Location(objs[11].loc.x, objs[11].loc.y + 80));
+		Coords.push(new Location(objs[11].loc.x + 20, objs[11].loc.y + 110));
+		Coords.push(new Location(objs[12].loc.x, objs[12].loc.y + 60));
+		Coords.push(new Location(objs[13].loc.x, objs[13].loc.y + 45));
+		Coords.push(new Location(objs[14].loc.x, objs[14].loc.y + 60));
+		Coords.push(new Location(objs[15].loc.x, objs[12].loc.y + 80));
+		Coords.push(new Location(objs[15].loc.x - 20, objs[15].loc.y + 110));
 
-		objs[16].addLeg(new Location(objs[16].loc.x, objs[16].loc.y + 120), 1.5);
-		objs[17].addLeg(new Location(objs[17].loc.x, objs[17].loc.y + 70), 1.2);
-		objs[18].addLeg(new Location(objs[18].loc.x, objs[18].loc.y + 55), 1.2);
-		objs[19].addLeg(new Location(objs[19].loc.x, objs[19].loc.y + 70), 1.2);
-		objs[20].addLeg(new Location(objs[20].loc.x, objs[20].loc.y + 120), 1.5);
+		Coords.push(new Location(objs[16].loc.x, objs[16].loc.y + 120));
+		Coords.push(new Location(objs[17].loc.x, objs[17].loc.y + 70));
+		Coords.push(new Location(objs[18].loc.x, objs[18].loc.y + 55));
+		Coords.push(new Location(objs[19].loc.x, objs[19].loc.y + 70));
+		Coords.push(new Location(objs[20].loc.x, objs[20].loc.y + 120));
 
-		objs[21].addLeg(new Location(objs[21].loc.x + 10, objs[21].loc.y + 20), .75);
-		objs[21].addLeg(new Location(objs[21].loc.x + 90, objs[21].loc.y), .75);
-		objs[21].addLeg(new Location(objs[21].loc.x + 140, objs[21].loc.y - 360), 2);
+		Coords.push(new Location(objs[21].loc.x + 10, objs[21].loc.y + 20));
+		Coords.push(new Location(objs[21].loc.x + 90, objs[21].loc.y));
+		Coords.push(new Location(objs[21].loc.x + 140, objs[21].loc.y - 360));
+		
+
+		objs[11].addLeg(Coords[11], .6);
+		objs[11].addLeg(Coords[12], 1);
+		objs[12].addLeg(Coords[13], .9);
+		objs[13].addLeg(Coords[14], .9);
+		objs[14].addLeg(Coords[15], .9);
+		objs[15].addLeg(Coords[16], .6);
+		objs[15].addLeg(Coords[17], 1);
+
+		objs[16].addLeg(Coords[18], 1.5);
+		objs[17].addLeg(Coords[19], 1.2);
+		objs[18].addLeg(Coords[20], 1.2);
+		objs[19].addLeg(Coords[21], 1.2);
+		objs[20].addLeg(Coords[22], 1.5);
+
+		objs[21].addLeg(Coords[23], .75);
+		objs[21].addLeg(Coords[24], .75);
+		objs[21].addLeg(Coords[25], 2);
 	}
 
 	var recv1 = objs[2];
 	var recv2 = objs[3];
 	var recv3 = objs[4];
 	var recv4 = objs[5];
+
+	var makeLine = function(s_coord, e_coord){
+		var Line1 = new PIXI.Graphics();
+		Line1.lineStyle(line_height * 2, 0xffff00, 1);
+		Line1.pivot.set(0, 0);
+		Line1.rotation = 0;
+		Line1.x = 15;
+		Line1.moveTo(s_coord.x, s_coord.y);
+		Line1.lineTo(e_coord.x, e_coord.y);
+		PlayLines.push(Line1);
+	}
+
+	var Disp_Routes = function(){
+		makeLine(recv1.loc, Coords[0]);
+		makeLine(Coords[0], Coords[1]);
+
+		makeLine(recv2.loc, Coords[2]);
+		makeLine(Coords[2], Coords[3]);
+		makeLine(Coords[3], Coords[4]);
+
+		makeLine(recv3.loc, Coords[5]);
+
+
+		makeLine(recv4.loc, Coords[6]);
+		makeLine(Coords[6], Coords[7]);
+
+
+		for(i = 0; i < PlayLines.length; i++) {
+			app.stage.addChild(PlayLines[i]);
+		}
+	}
+
+	var Clear_Routes = function(){
+		for(i = PlayLines.length - 1; i >= 0 ; i--) {
+			PlayLines[i].destroy();
+			PlayLines.pop();
+		}
+	}
 
 
 	/* ~~~~~~~~~~~~~~ CHANGE CODE BELOW ~~~~~~~~~~~~~~ */
@@ -564,7 +678,7 @@ var Quarter_Back = function(_name, _loc, wait, _ball) {
 
 
 	objs[0].setPlayer(objs[1]);
-	objs[1].setRecv(recv4);
+	objs[1].setRecv(recv2);
 
 	/* ~~~~~~~~~~~~~~ CHANGE CODE ABOVE ~~~~~~~~~~~~~~ */
 
@@ -575,12 +689,29 @@ var Quarter_Back = function(_name, _loc, wait, _ball) {
 	objs[10].setRecvs([recv1, recv2, recv3, recv4]);
 
 
-app.ticker.add(function(delta) {
-	//console.log(objs[2].hasBall, objs[3].hasBall, objs[4].hasBall, objs[5].hasBall);
-
-	for(i = 0; i < objs.length; i++) {
-		objs[i].action();
-	}
-	if(End_Game) return;
+	var index = 0;
 	loadSprites(objs);
-});
+	app.ticker.add(function(delta) {
+		if(End_Game) return;
+
+		if(index == 2) {
+			app.ticker.stop();
+		}
+
+		if(index == 4) {
+			Disp_Routes();
+			loadSprites(objs);
+			app.ticker.stop();
+		}
+
+		for(i = 0; i < objs.length; i++) {
+			objs[i].action();
+		}
+
+		loadSprites(objs);
+		index++;
+
+	});
+}
+
+play();
