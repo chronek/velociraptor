@@ -103,16 +103,16 @@ var Player = function(_name, _loc) {
 	this.status = "free" 	//Could be free, blocked, ball, tackled
 	this.yards = 0; 		//how many yards made by player with the ball
 	this.index = 0;			//position into steps
-  this.hasBall = false;
+	this.hasBall = false;
 
-  this.steps = [this.loc];
+	this.steps = [this.loc];
 
 
-  this.takeBall = function() {
-    this.hasBall = true;
-  }
+	this.takeBall = function() {
+	this.hasBall = true;
+	}
 
-  this.addLeg = function(loc, time) {
+	this.addLeg = function(loc, time) {
 		var lastLoc = this.steps[this.steps.length - 1];
 
 		for(i = 1; i <= time * 60; i++) {
@@ -169,10 +169,11 @@ var Defensive_Back = function(_name, _speed, _loc) {
 	}
 
 	this.chase = function(targetLoc, speed_multiplier) {
-		this.loc.x = this.loc.x + ((targetLoc.x - this.loc.x)
+		newLoc = new Location((targetLoc.x - this.loc.x), (targetLoc.y - this.loc.y))
+		this.loc.x = this.loc.x + (newLoc.x
 			* this.ROC(targetLoc, speed_multiplier * (this.speed / 60)));
 
-		this.loc.y = this.loc.y + ((targetLoc.y - this.loc.y)
+		this.loc.y = this.loc.y + (newLoc.y
 			* this.ROC(targetLoc, speed_multiplier * (this.speed / 60)));
 	}
 
@@ -181,13 +182,14 @@ var Defensive_Back = function(_name, _speed, _loc) {
 	}
 }
 
-var Defensive_Back_Man = function(_name, _speed, _target, _loc) {
+var Defensive_Back_Man = function(_name, _speed, _target, _loc, _ball) {
 	Defensive_Back.call(this, _name, _speed, _loc);
 	this.target = _target;
 	this.thresh = this.loc.y + 25;
+	this.ball = _ball;
 
 	this.slide = function() {
-		this.loc.x = this.target.loc.x;
+		this.loc.x += 0.8 * (this.target.loc.x - this.loc.x);
 	}
 
 	this.move = function() {
@@ -200,7 +202,60 @@ var Defensive_Back_Man = function(_name, _speed, _target, _loc) {
 	}
 
 	this.action = function() {
-		this.move();
+		if(this.ball.caught) {
+			newLoc = new Location (this.ball.player.loc.x - 80, this.ball.player.loc.y -180);
+			this.chase(newLoc, .4);
+		}
+		else {
+			this.move();
+		}
+
+	}
+}
+
+var Defensive_Saftey = function(_name, _speed, _loc) {
+	Defensive_Back.call(this, _name, _speed, _loc);
+	this.recvs = [];
+	this.target;
+	this.lead = 60;
+	this.final = false;
+
+	this.setRecvs = function(_recvs){
+		this.recvs = _recvs;
+		this.target = this.recvs[0];
+	}
+
+	this.chooseTarget = function(){
+		if(this.final == false){
+			for(j = 0; j < this.recvs.length; j++) {
+				if(this.recvs[j].loc.y < this.target.loc.y) {
+					this.target = this.recvs[j];
+				}
+				if(this.recvs[j].hasBall == true){
+					this.target = this.recvs[j];
+					this.final = true;
+					this.lead = 30;
+					break;
+				}
+			}
+		}
+	}
+
+	this.action = function() {
+		this.chooseTarget();
+		if(this.target.hasBall) {
+			if(this.target.steps[this.target.index + this.lead] != undefined)
+				newLoc = this.target.steps[this.target.index + this.lead];
+			else newLoc = new Location(this.target.loc.x, this.target.loc.y - 80);
+			this.chase(newLoc, 1.2 + (50 - this.lead)/100);
+		}
+		else if(this.target.loc.y <= this.loc.y + height * 1.5) {
+			newLoc = this.target.steps[this.target.index + this.lead];
+			this.chase(newLoc, 2 + (30 - this.lead)/50);
+		}
+		if(this.lead > 10) {
+			this.lead--;
+		}
 	}
 }
 
@@ -349,15 +404,16 @@ var Quarter_Back = function(_name, _loc, wait, _ball) {
 	var objs = [];
 
 	objs.push(new Ball("pass"));
-	objs.push(new Quarter_Back("qb", new Location(width / 2 - 20, 680), .4, objs[0]));
+	objs.push(new Quarter_Back("qb", new Location(width / 2 - 20, 680), 1, objs[0]));
 	objs.push(new Receiver("r1", new Location(125, 8 * height), objs[1], objs[0]));
 	objs.push(new Receiver("r2", new Location(225, 8 * height), objs[1], objs[0]));
 	objs.push(new Receiver("r3", new Location(width - 225, 8 * height), objs[1], objs[0]));
 	objs.push(new Receiver("r4", new Location(width - 125, 8 * height), objs[1], objs[0]));
-	objs.push(new Defensive_Back_Man('d1', 120, objs[2], new Location(125, 6 * height)));
-	objs.push(new Defensive_Back_Man('d2', 120, objs[3], new Location(225, 6 * height)));
-	objs.push(new Defensive_Back_Man('d3', 120, objs[4], new Location(width - 225, 6 * height)));
-	objs.push(new Defensive_Back_Man('d4', 120, objs[5], new Location(width - 125, 6 * height)));
+	objs.push(new Defensive_Back_Man('d1', 120, objs[2], new Location(125, 6 * height), objs[0] ));
+	objs.push(new Defensive_Back_Man('d2', 120, objs[3], new Location(225, 6 * height), objs[0]));
+	objs.push(new Defensive_Back_Man('d3', 120, objs[4], new Location(width - 225, 6 * height), objs[0]));
+	objs.push(new Defensive_Back_Man('d4', 120, objs[5], new Location(width - 125, 6 * height), objs[0]));
+	objs.push(new Defensive_Saftey('s', 140, new Location((width / 2 - 20), 2.5 * height)));
 
 	Sprites.push(PIXI.Sprite.fromImage("American_Football.png"));
 	Sprites.push(PIXI.Sprite.fromImage("Lol_circle.png"));
@@ -365,10 +421,12 @@ var Quarter_Back = function(_name, _loc, wait, _ball) {
 	Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
 	Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
 	Sprites.push(PIXI.Sprite.fromImage("Pan_Blue_Circle.png"));
-	Sprites.push(PIXI.Sprite.fromImage("red_thing.png"));
-	Sprites.push(PIXI.Sprite.fromImage("red_thing.png"));
-	Sprites.push(PIXI.Sprite.fromImage("red_thing.png"));
-	Sprites.push(PIXI.Sprite.fromImage("red_thing.png"));
+	Sprites.push(PIXI.Sprite.fromImage("red-circle-hi.png"));
+	Sprites.push(PIXI.Sprite.fromImage("red-circle-hi.png"));
+	Sprites.push(PIXI.Sprite.fromImage("red-circle-hi.png"));
+	Sprites.push(PIXI.Sprite.fromImage("red-circle-hi.png"));
+	Sprites.push(PIXI.Sprite.fromImage("red-circle-hi.png"));
+
 
 	function loadSprites(_objs){
 		for(i = Sprites.length - 1; i >= 0 ; i--) {
@@ -396,17 +454,18 @@ var Quarter_Back = function(_name, _loc, wait, _ball) {
 	objs[5].addLeg(new Location(objs[5].loc.x + 85, 180), 3.5);
 	objs[5].addLeg(new Location(objs[5].loc.x + 85, 0), 1.4);
 
-	var recv1 = 2;
-	var recv2 = 3;
-	var recv3 = 4;
-	var recv4 = 5;
+	var recv1 = objs[2];
+	var recv2 = objs[3];
+	var recv3 = objs[4];
+	var recv4 = objs[5];
 
 	objs[0].setPlayer(objs[1]);
-	objs[1].setRecv(objs[recv1]);
+	objs[1].setRecv(recv2);
+	objs[10].setRecvs([recv1, recv2, recv3, recv4]);
 
 
 app.ticker.add(function(delta) {
-	console.log(objs[2].hasBall, objs[3].hasBall, objs[4].hasBall, objs[5].hasBall);
+	//console.log(objs[2].hasBall, objs[3].hasBall, objs[4].hasBall, objs[5].hasBall);
 
 	for(i = 0; i < objs.length; i++) {
 		objs[i].action();

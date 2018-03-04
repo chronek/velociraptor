@@ -21,7 +21,8 @@ RB Object
 	@ - runs route
 
 Receiver Object
-	- 
+	@ - can catch ball
+
 
 Saftey Object
 	- 
