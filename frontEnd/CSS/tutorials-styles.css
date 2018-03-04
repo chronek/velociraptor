@@ -20,20 +20,22 @@ body {
       margin-left:30px;
       margin-top:20px;
   }
-  
 
-  
+#test {
+  align-content: center;
+}
+
   /* The slow way */
   .make-it-slow {
     box-shadow: 0 1px 2px rgba(0,0,0,0.15);
     transition: box-shadow 0.3s ease-in-out;
   }
-  
+
   /* Transition to a bigger shadow on hover */
   .make-it-slow:hover {
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
   }
-  
+
   .links {
     font-family: 'Julius Sans One', sans-serif;
     font-weight: bold;
@@ -46,7 +48,7 @@ body {
   }
 
 h5{
-    color: 	#28333b; 
+    color: 	#28333b;
 }
 
 .btn:hover{
