@@ -564,7 +564,7 @@ var Quarter_Back = function(_name, _loc, wait, _ball) {
 
 
 	objs[0].setPlayer(objs[1]);
-	objs[1].setRecv(recv4);
+	objs[1].setRecv(recv1);
 
 	/* ~~~~~~~~~~~~~~ CHANGE CODE ABOVE ~~~~~~~~~~~~~~ */
 
