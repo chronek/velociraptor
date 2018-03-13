@@ -31,5 +31,5 @@ Links to Dependencies:
 * https://github.com/chronek/velociraptor/blob/master/LICENSE
 
 ## Visit the site
-http://velociraptorfootball.me/frontEnd/html/home.html
+http://velociraptorfootball.me/velociraptor/frontEnd/html/home.html
 
